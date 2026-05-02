@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Dienstplan - Universitätsklinikum Sonnenberg</title>
+    <style>
+        :root {
+            --falken-blue: #000e2b;
+            --falken-gold: #ffd700;
+            --bg-light: #f4f4f4;
+            --table-header: #2d5a41; /* Dunkelgrün aus Vorlage */
+            --white: #ffffff;
+            
+            /* Arzt-Farben */
+            --color-mueller: #e74c3c; /* Rot */
+            --color-white: #3498db;   /* Blau */
+            --color-wolf: #9b59b6;    /* Lila */
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-light); 
+            margin: 0; padding: 0; 
+        }
+
+        header {
+            background-color: var(--falken-blue);
+            color: white; padding: 25px;
+            border-bottom: 5px solid var(--falken-gold);
+            text-align: center;
+        }
+
+        .logo { height: 120px; margin-bottom: 10px; }
+
+        .main-container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background-color: var(--table-header);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            border: 1px solid #3e7a58;
+        }
+
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            font-size: 0.9em;
+        }
+
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #fffde6; }
+
+        .today {
+            background-color: #fff9c4 !important;
+            font-weight: bold;
+            outline: 2px solid var(--falken-gold);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .p-mueller { background-color: var(--color-mueller); }
+        .p-white { background-color: var(--color-white); }
+        .p-wolf { background-color: var(--color-wolf); }
+        
+        .weekend { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="https://cdn.discordapp.com/attachments/837736666125828096/1500153664801734758/82f8c863-8ebb-46a4-8b25-b236ab76559f.png?ex=69f76679&is=69f614f9&hm=f9cfad03766ded30d54b22af53df7803039a45093ba60616fa27c75caa76c658&" alt="Logo" class="logo">
+    <h1 style="margin: 0; letter-spacing: 2px;">Dienstplan - Universitätsklinikum Sonnenberg</h1>
+</header>
+
+<div class="main-container">
+    <h2 id="month-label" style="color: var(--falken-blue); border-left: 5px solid var(--falken-gold); padding-left: 15px;">Dienstplan Aktuell</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Tag</th>
+                <th>🏥 ZNA</th>
+                <th>🚑 NEF 82/1</th>
+                <th>🚁 RTH Christoph</th>
+                <th>📞 Rufbereitschaft</th>
+            </tr>
+        </thead>
+        <tbody id="roster-body">
+            <!-- JS generiert die Inhalte -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const aerzte = [
+        { name: "Dr. med. Leon Müller", class: "p-mueller" },
+        { name: "Dr. med. Lukas White", class: "p-white" },
+        { name: "Dr. med. Jan Wolf", class: "p-wolf" }
+    ];
+
+    function generateRoster() {
+        const tbody = document.getElementById('roster-body');
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+        
+        const label = document.getElementById('month-label');
+        label.innerText = `Dienstplan ${new Date(year, month).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}`;
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const isToday = date.toDateString() === today.toDateString();
+            const weekdayNum = date.getDay(); // 0 = So, 6 = Sa
+            const weekdayStr = date.toLocaleDateString('de-DE', { weekday: 'short' });
+            
+            const tr = document.createElement('tr');
+            if (isToday) tr.className = 'today';
+
+            // Rotations-Logik: Jeder Arzt rückt jeden Tag eine Position weiter
+            // So verteilt sich NEF, RTH und ZNA gleichmäßig auf die drei Herren
+            const znaArzt = aerzte[day % 3];
+            const nefArzt = aerzte[(day + 1) % 3];
+            const rthArzt = aerzte[(day + 2) % 3];
+            const rufArzt = aerzte[day % 3]; // Rufbereitschaft rotiert mit
+
+            tr.innerHTML = `
+                <td>${day.toString().padStart(2, '0')}.${(month+1).toString().padStart(2, '0')}</td>
+                <td class="${(weekdayNum === 0 || weekdayNum === 6) ? 'weekend' : ''}">${weekdayStr}</td>
+                <td><span class="badge ${znaArzt.class}">${znaArzt.name}</span></td>
+                <td><span class="badge ${nefArzt.class}">${nefArzt.name}</span></td>
+                <td><span class="badge ${rthArzt.class}">${rthArzt.name}</span></td>
+                <td><span class="badge ${rufArzt.class}">${rufArzt.name}</span></td>
+            `;
+            tbody.appendChild(tr);
+        }
+    }
+
+    window.onload = generateRoster;
+</script>
+
+</body>
+</html>
