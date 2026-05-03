@@ -34,7 +34,7 @@
 
         .main-container {
             padding: 30px;
-            max-width: 1200px;
+            max-width: 1400px; /* Etwas breiter für die zusätzliche Spalte */
             margin: 0 auto;
             overflow-x: auto;
         }
@@ -51,7 +51,7 @@
             color: white;
             padding: 15px;
             text-align: left;
-            font-size: 0.9em;
+            font-size: 0.85em;
             text-transform: uppercase;
             border: 1px solid #3e7a58;
         }
@@ -73,12 +73,13 @@
 
         .badge {
             display: inline-block;
-            padding: 5px 10px;
+            padding: 5px 8px;
             border-radius: 4px;
             font-weight: bold;
             color: white;
-            min-width: 140px;
+            min-width: 130px;
             text-align: center;
+            font-size: 0.85em;
         }
 
         .p-mueller { background-color: var(--color-mueller); }
@@ -105,6 +106,7 @@
                 <th>Tag</th>
                 <th>🏥 ZNA</th>
                 <th>🚑 NEF 82/1</th>
+                <th>🚑 NEF 82/2</th>
                 <th>🚁 RTH Christoph</th>
                 <th>📞 Rufbereitschaft</th>
             </tr>
@@ -142,18 +144,19 @@
             const tr = document.createElement('tr');
             if (isToday) tr.className = 'today';
 
-            // Rotations-Logik: Jeder Arzt rückt jeden Tag eine Position weiter
-            // So verteilt sich NEF, RTH und ZNA gleichmäßig auf die drei Herren
+            // Rotations-Logik (Modulo 3, da 3 Ärzte im Pool)
             const znaArzt = aerzte[day % 3];
-            const nefArzt = aerzte[(day + 1) % 3];
-            const rthArzt = aerzte[(day + 2) % 3];
-            const rufArzt = aerzte[day % 3]; // Rufbereitschaft rotiert mit
+            const nef1Arzt = aerzte[(day + 1) % 3];
+            const nef2Arzt = aerzte[(day + 2) % 3];
+            const rthArzt = aerzte[day % 3];      // Hier überschneidet sich die Rotation zwangsläufig bei nur 3 Ärzten
+            const rufArzt = aerzte[(day + 1) % 3]; 
 
             tr.innerHTML = `
                 <td>${day.toString().padStart(2, '0')}.${(month+1).toString().padStart(2, '0')}</td>
                 <td class="${(weekdayNum === 0 || weekdayNum === 6) ? 'weekend' : ''}">${weekdayStr}</td>
                 <td><span class="badge ${znaArzt.class}">${znaArzt.name}</span></td>
-                <td><span class="badge ${nefArzt.class}">${nefArzt.name}</span></td>
+                <td><span class="badge ${nef1Arzt.class}">${nef1Arzt.name}</span></td>
+                <td><span class="badge ${nef2Arzt.class}">${nef2Arzt.name}</span></td>
                 <td><span class="badge ${rthArzt.class}">${rthArzt.name}</span></td>
                 <td><span class="badge ${rufArzt.class}">${rufArzt.name}</span></td>
             `;
