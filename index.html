@@ -8,13 +8,15 @@
             --falken-blue: #000e2b;
             --falken-gold: #ffd700;
             --bg-light: #f4f4f4;
-            --table-header: #2d5a41; /* Dunkelgrün aus Vorlage */
+            --table-header: #2d5a41;
             --white: #ffffff;
             
             /* Arzt-Farben */
-            --color-mueller: #e74c3c; /* Rot */
-            --color-white: #3498db;   /* Blau */
-            --color-wolf: #9b59b6;    /* Lila */
+            --color-mueller: #e74c3c;
+            --color-white: #3498db;
+            --color-wolf: #9b59b6;
+            --color-kiese: #2ecc71;
+            --color-empty: #7f8c8d;
         }
 
         body { 
@@ -34,7 +36,7 @@
 
         .main-container {
             padding: 30px;
-            max-width: 1400px; /* Etwas breiter für die zusätzliche Spalte */
+            max-width: 1500px;
             margin: 0 auto;
             overflow-x: auto;
         }
@@ -59,7 +61,7 @@
         td {
             padding: 12px;
             border: 1px solid #ddd;
-            font-size: 0.9em;
+            font-size: 0.85em;
         }
 
         tr:nth-child(even) { background-color: #f9f9f9; }
@@ -73,18 +75,24 @@
 
         .badge {
             display: inline-block;
-            padding: 5px 8px;
+            padding: 4px 8px;
             border-radius: 4px;
             font-weight: bold;
             color: white;
-            min-width: 130px;
+            min-width: 140px;
             text-align: center;
-            font-size: 0.85em;
+            margin: 2px 0;
+        }
+
+        .badge-empty {
+            background-color: var(--color-empty);
+            font-style: italic;
         }
 
         .p-mueller { background-color: var(--color-mueller); }
         .p-white { background-color: var(--color-white); }
         .p-wolf { background-color: var(--color-wolf); }
+        .p-kiese { background-color: var(--color-kiese); }
         
         .weekend { color: #e74c3c; font-weight: bold; }
     </style>
@@ -104,15 +112,14 @@
             <tr>
                 <th>Datum</th>
                 <th>Tag</th>
-                <th>🏥 ZNA</th>
+                <th>🏥 ZNA (Min. 2 Pers.)</th>
                 <th>🚑 NEF 82/1</th>
-                <th>🚑 NEF 82/2</th>
                 <th>🚁 RTH Christoph</th>
+                <th>🚑 (NEF 82/2)</th>
                 <th>📞 Rufbereitschaft</th>
             </tr>
         </thead>
         <tbody id="roster-body">
-            <!-- JS generiert die Inhalte -->
         </tbody>
     </table>
 </div>
@@ -121,7 +128,8 @@
     const aerzte = [
         { name: "Dr. med. Leon Müller", class: "p-mueller" },
         { name: "Dr. med. Lukas White", class: "p-white" },
-        { name: "Dr. med. Jan Wolf", class: "p-wolf" }
+        { name: "Dr. med. Jan Wolf", class: "p-wolf" },
+        { name: "Dr. med. Kimi Kiese", class: "p-kiese" }
     ];
 
     function generateRoster() {
@@ -138,27 +146,35 @@
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
             const isToday = date.toDateString() === today.toDateString();
-            const weekdayNum = date.getDay(); // 0 = So, 6 = Sa
+            const weekdayNum = date.getDay();
             const weekdayStr = date.toLocaleDateString('de-DE', { weekday: 'short' });
             
             const tr = document.createElement('tr');
             if (isToday) tr.className = 'today';
 
-            // Rotations-Logik (Modulo 3, da 3 Ärzte im Pool)
-            const znaArzt = aerzte[day % 3];
-            const nef1Arzt = aerzte[(day + 1) % 3];
-            const nef2Arzt = aerzte[(day + 2) % 3];
-            const rthArzt = aerzte[day % 3];      // Hier überschneidet sich die Rotation zwangsläufig bei nur 3 Ärzten
-            const rufArzt = aerzte[(day + 1) % 3]; 
+            // Verteilung bei 4 Ärzten gemäß Priorität:
+            // 1. ZNA (2 Personen)
+            // 2. NEF 1 (1 Person)
+            // 3. RTH (1 Person)
+            // -> Damit sind alle 4 verbraucht. NEF 2 bleibt "Standby / Nicht besetzt"
+            
+            const zna1 = aerzte[day % 4];
+            const zna2 = aerzte[(day + 1) % 4];
+            const nef1 = aerzte[(day + 2) % 4];
+            const rth  = aerzte[(day + 3) % 4];
+            const ruf  = aerzte[(day + 1) % 4]; // Rufbereitschaft übernimmt einer aus der ZNA
 
             tr.innerHTML = `
                 <td>${day.toString().padStart(2, '0')}.${(month+1).toString().padStart(2, '0')}</td>
                 <td class="${(weekdayNum === 0 || weekdayNum === 6) ? 'weekend' : ''}">${weekdayStr}</td>
-                <td><span class="badge ${znaArzt.class}">${znaArzt.name}</span></td>
-                <td><span class="badge ${nef1Arzt.class}">${nef1Arzt.name}</span></td>
-                <td><span class="badge ${nef2Arzt.class}">${nef2Arzt.name}</span></td>
-                <td><span class="badge ${rthArzt.class}">${rthArzt.name}</span></td>
-                <td><span class="badge ${rufArzt.class}">${rufArzt.name}</span></td>
+                <td>
+                    <span class="badge ${zna1.class}">${zna1.name}</span><br>
+                    <span class="badge ${zna2.class}">${zna2.name}</span>
+                </td>
+                <td><span class="badge ${nef1.class}">${nef1.name}</span></td>
+                <td><span class="badge ${rth.class}">${rth.name}</span></td>
+                <td><span class="badge badge-empty">Nicht besetzt *</span></td>
+                <td><span class="badge ${ruf.class}">${ruf.name}</span></td>
             `;
             tbody.appendChild(tr);
         }
@@ -166,6 +182,10 @@
 
     window.onload = generateRoster;
 </script>
+
+<p style="padding: 0 30px; font-size: 0.8em; color: #666;">
+    * Hinweis: Das (NEF 82/2) wird erst bei einer Personalstärke > 4 besetzt, um die Mindestbesetzung der ZNA (2 Pers.) sowie NEF 1 und RTH zu gewährleisten.
+</p>
 
 </body>
 </html>
