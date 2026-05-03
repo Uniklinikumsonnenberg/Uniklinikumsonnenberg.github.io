@@ -16,7 +16,7 @@
             --color-white: #3498db;
             --color-wolf: #9b59b6;
             --color-kiese: #2ecc71;
-            --color-empty: #7f8c8d;
+            --color-empty: #bdc3c7;
         }
 
         body { 
@@ -36,7 +36,7 @@
 
         .main-container {
             padding: 30px;
-            max-width: 1500px;
+            max-width: 1550px;
             margin: 0 auto;
             overflow-x: auto;
         }
@@ -52,7 +52,7 @@
             background-color: var(--table-header);
             color: white;
             padding: 15px;
-            text-align: left;
+            text-align: center;
             font-size: 0.85em;
             text-transform: uppercase;
             border: 1px solid #3e7a58;
@@ -62,6 +62,7 @@
             padding: 12px;
             border: 1px solid #ddd;
             font-size: 0.85em;
+            text-align: center;
         }
 
         tr:nth-child(even) { background-color: #f9f9f9; }
@@ -75,18 +76,21 @@
 
         .badge {
             display: inline-block;
-            padding: 4px 8px;
+            padding: 6px 10px;
             border-radius: 4px;
             font-weight: bold;
             color: white;
-            min-width: 140px;
+            min-width: 160px;
             text-align: center;
             margin: 2px 0;
         }
 
         .badge-empty {
             background-color: var(--color-empty);
+            color: #7f8c8d;
             font-style: italic;
+            border: 1px dashed #7f8c8d;
+            min-width: 140px;
         }
 
         .p-mueller { background-color: var(--color-mueller); }
@@ -120,8 +124,13 @@
             </tr>
         </thead>
         <tbody id="roster-body">
+            <!-- Inhalte werden per JS generiert -->
         </tbody>
     </table>
+
+    <p style="margin-top: 20px; font-size: 0.85em; color: #666; font-style: italic;">
+        * Logik: Bei einer Personalstärke von 4 Personen werden primär die ZNA (Doppelbesetzung), das NEF 82/1 und der RTH besetzt. Das (NEF 82/2) verbleibt im Standby.
+    </p>
 </div>
 
 <script>
@@ -152,28 +161,25 @@
             const tr = document.createElement('tr');
             if (isToday) tr.className = 'today';
 
-            // Verteilung bei 4 Ärzten gemäß Priorität:
-            // 1. ZNA (2 Personen)
-            // 2. NEF 1 (1 Person)
-            // 3. RTH (1 Person)
-            // -> Damit sind alle 4 verbraucht. NEF 2 bleibt "Standby / Nicht besetzt"
+            // Faire Rotation: Die Startposition verschiebt sich jeden Tag um 1
+            const p1 = aerzte[(day + 0) % 4]; // ZNA Pos 1
+            const p2 = aerzte[(day + 1) % 4]; // ZNA Pos 2
+            const p3 = aerzte[(day + 2) % 4]; // NEF 82/1
+            const p4 = aerzte[(day + 3) % 4]; // RTH Christoph
             
-            const zna1 = aerzte[day % 4];
-            const zna2 = aerzte[(day + 1) % 4];
-            const nef1 = aerzte[(day + 2) % 4];
-            const rth  = aerzte[(day + 3) % 4];
-            const ruf  = aerzte[(day + 1) % 4]; // Rufbereitschaft übernimmt einer aus der ZNA
+            // Rufbereitschaft wird rollierend von einem der ZNA-Ärzte übernommen
+            const ruf = p1; 
 
             tr.innerHTML = `
                 <td>${day.toString().padStart(2, '0')}.${(month+1).toString().padStart(2, '0')}</td>
                 <td class="${(weekdayNum === 0 || weekdayNum === 6) ? 'weekend' : ''}">${weekdayStr}</td>
                 <td>
-                    <span class="badge ${zna1.class}">${zna1.name}</span><br>
-                    <span class="badge ${zna2.class}">${zna2.name}</span>
+                    <span class="badge ${p1.class}">${p1.name}</span><br>
+                    <span class="badge ${p2.class}">${p2.name}</span>
                 </td>
-                <td><span class="badge ${nef1.class}">${nef1.name}</span></td>
-                <td><span class="badge ${rth.class}">${rth.name}</span></td>
-                <td><span class="badge badge-empty">Nicht besetzt *</span></td>
+                <td><span class="badge ${p3.class}">${p3.name}</span></td>
+                <td><span class="badge ${p4.class}">${p4.name}</span></td>
+                <td><span class="badge badge-empty">Standby</span></td>
                 <td><span class="badge ${ruf.class}">${ruf.name}</span></td>
             `;
             tbody.appendChild(tr);
@@ -182,10 +188,6 @@
 
     window.onload = generateRoster;
 </script>
-
-<p style="padding: 0 30px; font-size: 0.8em; color: #666;">
-    * Hinweis: Das (NEF 82/2) wird erst bei einer Personalstärke > 4 besetzt, um die Mindestbesetzung der ZNA (2 Pers.) sowie NEF 1 und RTH zu gewährleisten.
-</p>
 
 </body>
 </html>
