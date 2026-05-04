@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienstplan - Universitätsklinikum Sonnenberg</title>
+    <style>
+        :root {
+            --falken-blue: #000e2b;
+            --falken-gold: #ffd700;
+            --bg-light: #f4f4f4;
+            --table-header: #2d5a41;
+            --white: #ffffff;
+            
+            /* Arzt-Farben */
+            --color-mueller: #e74c3c;
+            --color-white: #3498db;
+            --color-wolf: #9b59b6;
+            --color-kiese: #2ecc71;
+            --color-empty: #bdc3c7;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-light); 
+            margin: 0; padding: 0; 
+        }
+
+        header {
+            background-color: var(--falken-blue);
+            color: white; padding: 25px;
+            text-align: center;
+        }
+
+        .logo { height: 120px; margin-bottom: 10px; }
+
+        /* Navigation Style */
+        .nav-bar {
+            background-color: var(--falken-blue);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 0 20px 0;
+            border-bottom: 5px solid var(--falken-gold);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: transparent;
+            color: white;
+            border: 2px solid var(--falken-gold);
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--falken-gold);
+            color: var(--falken-blue);
+        }
+
+        .nav-btn.active {
+            background-color: var(--falken-gold);
+            color: var(--falken-blue);
+        }
+
+        .main-container {
+            padding: 30px;
+            max-width: 1550px;
+            margin: 0 auto;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background-color: var(--table-header);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            border: 1px solid #3e7a58;
+        }
+
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            font-size: 0.85em;
+            text-align: center;
+        }
+
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #fffde6; }
+
+        .today {
+            background-color: #fff9c4 !important;
+            font-weight: bold;
+            outline: 2px solid var(--falken-gold);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+            min-width: 160px;
+            text-align: center;
+            margin: 2px 0;
+        }
+
+        .badge-empty {
+            background-color: var(--color-empty);
+            color: #7f8c8d;
+            font-style: italic;
+            border: 1px dashed #7f8c8d;
+            min-width: 140px;
+        }
+
+        .p-mueller { background-color: var(--color-mueller); }
+        .p-white { background-color: var(--color-white); }
+        .p-wolf { background-color: var(--color-wolf); }
+        .p-kiese { background-color: var(--color-kiese); }
+        
+        .weekend { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="https://r2.fivemanage.com/duNnRRRqkxrMPfikEWhQR/Bild_2026-05-04_224551624.png" alt="Logo" class="logo">
+    <h1 style="margin: 0; letter-spacing: 2px; text-transform: uppercase;">Universitätsklinikum Sonnenberg</h1>
+</header>
+
+<nav class="nav-bar">
+    <a href="#" class="nav-btn">🏠 Intranet</a>
+    <a href="#" class="nav-btn">💊 Medikamente</a>
+    <a href="#" class="nav-btn">📜 Leitlinien</a>
+    <a href="#" class="nav-btn active">📅 Dienstplan</a>
+</nav>
+
+<div class="main-container">
+    <h2 id="month-label" style="color: var(--falken-blue); border-left: 5px solid var(--falken-gold); padding-left: 15px;">Dienstplan Aktuell</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Tag</th>
+                <th>🏥 ZNA (Min. 2 Pers.)</th>
+                <th>🚑 NEF 82/1</th>
+                <th>🚁 RTH Christoph</th>
+                <th>🚑 (NEF 82/2)</th>
+                <th>📞 Rufbereitschaft</th>
+            </tr>
+        </thead>
+        <tbody id="roster-body">
+            <!-- Inhalte werden per JS generiert -->
+        </tbody>
+    </table>
+
+    <p style="margin-top: 20px; font-size: 0.85em; color: #666; font-style: italic;">
+        * Logik: Bei einer Personalstärke von 4 Personen werden primär die ZNA (Doppelbesetzung), das NEF 82/1 und der RTH besetzt. Das (NEF 82/2) verbleibt im Standby.
+    </p>
+</div>
+
+<script>
+    const aerzte = [
+        { name: "Dr. med. Leon Müller", class: "p-mueller" },
+        { name: "Dr. med. Lukas White", class: "p-white" },
+        { name: "Dr. med. Jan Wolf", class: "p-wolf" },
+        { name: "Dr. med. Kimi Kiese", class: "p-kiese" }
+    ];
+
+    function generateRoster() {
+        const tbody = document.getElementById('roster-body');
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+        
+        const label = document.getElementById('month-label');
+        label.innerText = `Dienstplan ${new Date(year, month).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}`;
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const isToday = date.toDateString() === today.toDateString();
+            const weekdayNum = date.getDay();
+            const weekdayStr = date.toLocaleDateString('de-DE', { weekday: 'short' });
+            
+            const tr = document.createElement('tr');
+            if (isToday) tr.className = 'today';
+
+            // Faire Rotation: Die Startposition verschiebt sich jeden Tag um 1
+            const p1 = aerzte[(day + 0) % 4]; // ZNA Pos 1
+            const p2 = aerzte[(day + 1) % 4]; // ZNA Pos 2
+            const p3 = aerzte[(day + 2) % 4]; // NEF 82/1
+            const p4 = aerzte[(day + 3) % 4]; // RTH Christoph
+            
+            // Rufbereitschaft wird rollierend von einem der ZNA-Ärzte übernommen
+            const ruf = p1; 
+
+            tr.innerHTML = `
+                <td>${day.toString().padStart(2, '0')}.${(month+1).toString().padStart(2, '0')}</td>
+                <td class="${(weekdayNum === 0 || weekdayNum === 6) ? 'weekend' : ''}">${weekdayStr}</td>
+                <td>
+                    <span class="badge ${p1.class}">${p1.name}</span><br>
+                    <span class="badge ${p2.class}">${p2.name}</span>
+                </td>
+                <td><span class="badge ${p3.class}">${p3.name}</span></td>
+                <td><span class="badge ${p4.class}">${p4.name}</span></td>
+                <td><span class="badge badge-empty">Standby</span></td>
+                <td><span class="badge ${ruf.class}">${ruf.name}</span></td>
+            `;
+            tbody.appendChild(tr);
+        }
+    }
+
+    window.onload = generateRoster;
+</script>
+
+</body>
+</html>
