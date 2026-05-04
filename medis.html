@@ -32,6 +32,39 @@
             align-items: center;
         }
 
+        /* Navigation Style */
+        .nav-bar {
+            background-color: var(--falken-blue);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 0 20px 0;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: transparent;
+            color: white;
+            border: 2px solid var(--falken-gold);
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--falken-gold);
+            color: var(--falken-blue);
+        }
+
+        .nav-btn.active-page {
+            background-color: var(--falken-gold);
+            color: var(--falken-blue);
+        }
+
         .sticky-container {
             position: sticky;
             top: 0;
@@ -140,6 +173,12 @@
 </header>
 
 <div class="sticky-container">
+    <nav class="nav-bar">
+        <a href="index.html" class="nav-btn">🏠 Intranet</a>
+        <a href="medis.html" class="nav-btn active-page">💊 Medikamente</a>
+        <a href="wdb.html" class="nav-btn">📜 Leitlinien</a>
+        <a href="dienstplan.html" class="nav-btn">📅 Dienstplan</a>
+    </nav>
     <div class="search-container" id="search-box">
         <input type="text" id="medSearch" placeholder="Name oder Wirkstoff suchen..." onkeyup="searchMeds()">
     </div>
