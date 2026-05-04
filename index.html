@@ -2,192 +2,148 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Dienstplan - Universitätsklinikum Sonnenberg</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intranet - Universitätsklinikum Sonnenberg</title>
     <style>
         :root {
             --falken-blue: #000e2b;
             --falken-gold: #ffd700;
             --bg-light: #f4f4f4;
-            --table-header: #2d5a41;
-            --white: #ffffff;
-            
-            /* Arzt-Farben */
-            --color-mueller: #e74c3c;
-            --color-white: #3498db;
-            --color-wolf: #9b59b6;
-            --color-kiese: #2ecc71;
-            --color-empty: #bdc3c7;
         }
 
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg-light); 
-            margin: 0; padding: 0; 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            margin: 0; 
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
         }
 
         header {
             background-color: var(--falken-blue);
-            color: white; padding: 25px;
+            color: white;
+            padding: 30px;
             border-bottom: 5px solid var(--falken-gold);
             text-align: center;
-        }
-
-        .logo { height: 120px; margin-bottom: 10px; }
-
-        .main-container {
-            padding: 30px;
-            max-width: 1550px;
-            margin: 0 auto;
-            overflow-x: auto;
-        }
-
-        table {
             width: 100%;
-            border-collapse: collapse;
+            box-sizing: border-box;
+        }
+
+        .logo { height: 200px; margin-bottom: 10px; width: auto;}
+
+        .container {
+            max-width: 900px;
+            width: 90%;
+            margin: 40px auto;
+            display: grid;
+            /* Definiert zwei Spalten */
+            grid-template-columns: 1fr 1fr; 
+            gap: 25px;
+        }
+
+        .dashboard-card {
             background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        th {
-            background-color: var(--table-header);
-            color: white;
-            padding: 15px;
+            border: 3px solid var(--falken-blue);
+            border-radius: 15px;
+            padding: 40px 20px;
             text-align: center;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            border: 1px solid #3e7a58;
+            text-decoration: none;
+            color: var(--falken-blue);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
         }
 
-        td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            font-size: 0.85em;
-            text-align: center;
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            background-color: var(--falken-gold);
+            border-color: var(--falken-gold);
         }
 
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        tr:hover { background-color: #fffde6; }
-
-        .today {
-            background-color: #fff9c4 !important;
-            font-weight: bold;
-            outline: 2px solid var(--falken-gold);
+        /* Spezial-Regel für die Pyramiden-Form (die 3. Karte) */
+        .dashboard-card:last-child {
+            grid-column: span 2; /* Nimmt den Platz von 2 Spalten ein */
+            justify-self: center; /* Zentriert die Karte in diesem Platz */
+            width: calc(50% - 12.5px); /* Macht sie exakt so breit wie die anderen (50% minus halber Gap) */
         }
 
-        .badge {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            color: white;
-            min-width: 160px;
-            text-align: center;
-            margin: 2px 0;
+        .icon { 
+            font-size: 4em; 
+            margin-bottom: 15px; 
         }
-
-        .badge-empty {
-            background-color: var(--color-empty);
-            color: #7f8c8d;
-            font-style: italic;
-            border: 1px dashed #7f8c8d;
-            min-width: 140px;
-        }
-
-        .p-mueller { background-color: var(--color-mueller); }
-        .p-white { background-color: var(--color-white); }
-        .p-wolf { background-color: var(--color-wolf); }
-        .p-kiese { background-color: var(--color-kiese); }
         
-        .weekend { color: #e74c3c; font-weight: bold; }
+        .card-title { 
+            font-size: 1.5em; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+        }
+        
+        .card-desc { 
+            font-size: 0.9em; 
+            color: #555; 
+            margin-top: 10px; 
+        }
+
+        /* Responsive Design für Handys */
+        @media (max-width: 600px) {
+            .container { 
+                grid-template-columns: 1fr; 
+            }
+            .dashboard-card:last-child {
+                grid-column: span 1;
+                width: 100%;
+            }
+        }
+
+        footer {
+            margin-top: auto; 
+            padding: 20px; 
+            color: #888; 
+            font-size: 0.8em;
+            text-align: center;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <img src="https://cdn.discordapp.com/attachments/837736666125828096/1500153664801734758/82f8c863-8ebb-46a4-8b25-b236ab76559f.png?ex=69f76679&is=69f614f9&hm=f9cfad03766ded30d54b22af53df7803039a45093ba60616fa27c75caa76c658&" alt="Logo" class="logo">
-    <h1 style="margin: 0; letter-spacing: 2px;">Dienstplan - Universitätsklinikum Sonnenberg</h1>
+    <img src="https://r2.fivemanage.com/duNnRRRqkxrMPfikEWhQR/Bild_2026-05-04_224551624.png" alt="Logo" class="logo">
+    <h1 style="margin: 0; letter-spacing: 2px;">INTRANET UKS</h1>
+    <div style="color: var(--falken-gold); font-weight: bold; margin-top: 5px;">Zentrales Wissensmanagement</div>
 </header>
 
-<div class="main-container">
-    <h2 id="month-label" style="color: var(--falken-blue); border-left: 5px solid var(--falken-gold); padding-left: 15px;">Dienstplan Aktuell</h2>
+<div class="container">
     
-    <table>
-        <thead>
-            <tr>
-                <th>Datum</th>
-                <th>Tag</th>
-                <th>🏥 ZNA (Min. 2 Pers.)</th>
-                <th>🚑 NEF 82/1</th>
-                <th>🚁 RTH Christoph</th>
-                <th>🚑 (NEF 82/2)</th>
-                <th>📞 Rufbereitschaft</th>
-            </tr>
-        </thead>
-        <tbody id="roster-body">
-            <!-- Inhalte werden per JS generiert -->
-        </tbody>
-    </table>
+    <a href="medis.html" class="dashboard-card">
+        <div class="icon">💊</div>
+        <div class="card-title">Medikamente</div>
+        <div class="card-desc">Dosierungen, Indikationen & Kontraindikationen</div>
+    </a>
 
-    <p style="margin-top: 20px; font-size: 0.85em; color: #666; font-style: italic;">
-        * Logik: Bei einer Personalstärke von 4 Personen werden primär die ZNA (Doppelbesetzung), das NEF 82/1 und der RTH besetzt. Das (NEF 82/2) verbleibt im Standby.
-    </p>
+    <a href="wdb.html" class="dashboard-card">
+        <div class="icon">📋</div>
+        <div class="card-title">Leitlinien (WDB)</div>
+        <div class="card-desc">Medizinische Algorithmen & Handlungsanweisungen</div>
+    </a>
+
+    <a href="dienstplan.html" class="dashboard-card">
+        <div class="icon">🗓️</div>
+        <div class="card-title">DIENSTPLAN</div>
+        <div class="card-desc">Dienstpläne & Ansprechpartner</div>
+    </a>
+
 </div>
 
-<script>
-    const aerzte = [
-        { name: "Dr. med. Leon Müller", class: "p-mueller" },
-        { name: "Dr. med. Lukas White", class: "p-white" },
-        { name: "Dr. med. Jan Wolf", class: "p-wolf" },
-        { name: "Dr. med. Kimi Kiese", class: "p-kiese" }
-    ];
-
-    function generateRoster() {
-        const tbody = document.getElementById('roster-body');
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth();
-        
-        const label = document.getElementById('month-label');
-        label.innerText = `Dienstplan ${new Date(year, month).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}`;
-
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(year, month, day);
-            const isToday = date.toDateString() === today.toDateString();
-            const weekdayNum = date.getDay();
-            const weekdayStr = date.toLocaleDateString('de-DE', { weekday: 'short' });
-            
-            const tr = document.createElement('tr');
-            if (isToday) tr.className = 'today';
-
-            // Faire Rotation: Die Startposition verschiebt sich jeden Tag um 1
-            const p1 = aerzte[(day + 0) % 4]; // ZNA Pos 1
-            const p2 = aerzte[(day + 1) % 4]; // ZNA Pos 2
-            const p3 = aerzte[(day + 2) % 4]; // NEF 82/1
-            const p4 = aerzte[(day + 3) % 4]; // RTH Christoph
-            
-            // Rufbereitschaft wird rollierend von einem der ZNA-Ärzte übernommen
-            const ruf = p1; 
-
-            tr.innerHTML = `
-                <td>${day.toString().padStart(2, '0')}.${(month+1).toString().padStart(2, '0')}</td>
-                <td class="${(weekdayNum === 0 || weekdayNum === 6) ? 'weekend' : ''}">${weekdayStr}</td>
-                <td>
-                    <span class="badge ${p1.class}">${p1.name}</span><br>
-                    <span class="badge ${p2.class}">${p2.name}</span>
-                </td>
-                <td><span class="badge ${p3.class}">${p3.name}</span></td>
-                <td><span class="badge ${p4.class}">${p4.name}</span></td>
-                <td><span class="badge badge-empty">Standby</span></td>
-                <td><span class="badge ${ruf.class}">${ruf.name}</span></td>
-            `;
-            tbody.appendChild(tr);
-        }
-    }
-
-    window.onload = generateRoster;
-</script>
+<footer>
+    © 2026 Universitätsklinikum Sonnenberg | Ärztlicher Direktor UKS
+</footer>
 
 </body>
 </html>
