@@ -12,6 +12,7 @@
             --indikation-blue: #e6f0ff;
             --ki-red: #ffe6e6;
             --nfs-blue: #0056b3;
+            --wirk-green: #e8f5e9;
         }
 
         body {
@@ -32,7 +33,6 @@
             align-items: center;
         }
 
-        /* Navigation Style */
         .nav-bar {
             background-color: var(--falken-blue);
             display: flex;
@@ -142,12 +142,13 @@
             justify-content: space-between;
         }
 
-        .grid-row { display: grid; grid-template-columns: 1fr 1fr; }
+        .grid-row { display: grid; grid-template-columns: 1fr 1fr 1fr; }
         .section-box { padding: 12px; border: 1px solid #eee; font-size: 0.85em; }
         .section-title { font-weight: bold; font-size: 0.8em; margin-bottom: 5px; color: var(--falken-blue); text-transform: uppercase; }
 
         .indikation { background-color: var(--indikation-blue); }
         .ki { background-color: var(--ki-red); }
+        .wirkung { background-color: var(--wirk-green); }
 
         .dosis-center { background-color: var(--falken-gold); padding: 6px; text-align: center; font-weight: bold; border-top: 1px solid var(--falken-blue); font-size: 0.9em;}
         .dosis-grid { display: grid; grid-template-columns: 1fr 1fr; }
@@ -192,45 +193,34 @@
 
 <script>
 const med_data = [
-    { name: "Adenosin", wirkstoff: "Adrekar", ind: "AV-Reentry-Tachykardien", ki: "Asthma, AV-Block II/III", erw: "6mg -> 12mg -> 12mg i.v. (schnell!)", kind: "0,1 mg/kg", app: "i.v. (herznah)", bes: "Kurze Asystolie möglich. Patient vorwarnen!" },
-    { name: "Amiodaron", wirkstoff: "Cordarex", ind: "Reanimation (VF/pVT), Tachyarrhythmien", ki: "Bradykardie, Jodallergie", erw: "Rea: 300mg i.v. | Tachy: 300mg Kurzinfusion", kind: "5 mg/kg i.v.", app: "i.v.", bes: "Nur mit Glucose 5% verdünnen (falls Infusion)." },
-    { name: "Amoxicillin", wirkstoff: "Antibiotikum", ind: "Bakterielle Infektionen", ki: "Penicillin-Allergie", erw: "Nach ärztlicher Anordnung", kind: "Dosis nach Gewicht", app: "p.o. | i.v.", bes: "Anaphylaxie-Gefahr beachten." },
-    { name: "ASS", wirkstoff: "Aspirin", ind: "ACS / Herzinfarkt", ki: "Magenulkus, Blutung, Asthma", erw: "250 - 500 mg i.v.", kind: "Keine Anwendung", app: "i.v. | p.o.", bes: "Hemmt Thrombozytenaggregation dauerhaft." },
-    { name: "Atropin", wirkstoff: "Atropinsulfat", ind: "Bradykardie, Antidot (Alkylphosphate)", ki: "Glaukom, Tachyarrhythmie", erw: "0,5 mg i.v. (bis max. 3mg)", kind: "0,01 - 0,02 mg/kg i.v.", app: "i.v.", bes: "Wirkt parasympatholytisch." },
-    { name: "Buscopan", wirkstoff: "Butylscopolamin", ind: "Koliken (Galle/Niere), Spasmen", ki: "Glaukom, Tachykardie", erw: "20 mg i.v. langsam", kind: "0,3 - 0,6 mg/kg i.v.", app: "i.v.", bes: "Kann Sehstörungen/Tachykardie verursachen." },
-    { name: "Esketamin", wirkstoff: "Ketanest S", ind: "Traumaschmerz, Narkose, Status Asthmaticus", ki: "ACS, Hypertonie > 180", erw: "0,125 - 0,25 mg/kg i.v.", kind: "0,25 - 0,5 mg/kg i.v./i.n.", app: "i.v. | i.n.", bes: "Immer mit Midazolam kombinieren (Alpträume)." },
-    { name: "Fentanyl", wirkstoff: "Fentanyl", ind: "Stärkste Schmerzen, Narkose", ki: "Ateminsuffizienz", erw: "0,05 - 0,1 mg i.v.", kind: "1 - 2 µg/kg i.v.", app: "i.v.", bes: "Stark atemdepressiv. Naloxon bereithalten." },
-    { name: "Flumazenil", wirkstoff: "Anexate", ind: "Antidot für Benzodiazepine", ki: "Mischintox mit trizykl. Antidepressiva", erw: "0,2 mg i.v. (titriert)", kind: "0,01 mg/kg i.v.", app: "i.v.", bes: "Kurze Wirkdauer (Re-Sedierung beachten)." },
-    { name: "Ibuprofen", wirkstoff: "Nurofen", ind: "Leichte/Mittelstarke Schmerzen, Fieber", ki: "Magenblutung, 3. Trimenon Schwangerschaft", erw: "400 - 800 mg p.o.", kind: "10 mg/kg p.o./supp.", app: "p.o. | supp.", bes: "NSAR-Klasse." },
-    { name: "Jonosteril", wirkstoff: "Isotone Vollelektrolytlösung", ind: "Flüssigkeitsersatz, Trägerlösung", ki: "Lungenödem", erw: "Nach Bedarf", kind: "20 ml/kg KG", app: "i.v.", bes: "Kristalloide Lösung der Wahl." },
-    { name: "Metamizol", wirkstoff: "Novalgin", ind: "Koliken, hohes Fieber, Schmerz", ki: "Asthma, Schwangerschaft", erw: "1g i.v. (Kurzinfusion)", kind: "10-15 mg/kg i.v.", app: "i.v.", bes: "Gefahr des Blutdruckabfalls bei schneller Gabe." },
-    { name: "Midazolam / Versed", wirkstoff: "Dormicum / Versed", ind: "Krampfanfall, Sedierung, Angst", ki: "Atemdepression, Schock", erw: "Krampf: 10mg i.n. / 2-5mg i.v.", kind: "0,1 mg/kg i.v. / 0,2 mg/kg i.n.", app: "i.v. | i.n. | i.m.", bes: "Wirkungseintritt i.n. ca. 2-3 Min." },
-    { name: "Morphin", wirkstoff: "Morphinsulfat", ind: "Starke Schmerzen, Lungenödem", ki: "Hypotonie, Ateminsuffizienz", erw: "2 - 5 mg i.v. titriert", kind: "0,1 mg/kg i.v.", app: "i.v.", bes: "Standard in der Analgesie." },
-    { name: "NaCl 0,9%", wirkstoff: "Kochsalzlösung", ind: "Spüllösung, Trägerlösung", ki: "Keine", erw: "Nach Bedarf", kind: "Nach Bedarf", app: "i.v.", bes: "Nicht als Volumenersatz bei Schock (Azidosegefahr)." },
-    { name: "Nalbuphin", wirkstoff: "Nalpain", ind: "Mittelstarke Schmerzen", ki: "Schwere Leberinsuffizienz", erw: "10 - 20 mg i.v.", kind: "0,1 - 0,2 mg/kg i.v.", app: "i.v.", bes: "Mischanagonist/-antagonist am Opioidrezeptor." },
-    { name: "Naloxon", wirkstoff: "Narcanti", ind: "Antidot für Opioide", ki: "Bekannte Abhängigkeit (Entzug)", erw: "0,1 - 0,4 mg i.v. titriert", kind: "0,01 mg/kg i.v.", app: "i.v. | i.n.", bes: "Wirkt kürzer als viele Opioide!" },
-    { name: "Noradrenalin", wirkstoff: "Arterenol", ind: "Septischer Schock, neurogener Schock", ki: "Keine im vitalen Notfall", erw: "0,1 - 1 µg/kg/min (Perfusor)", kind: "Nur nach Rücksprache", app: "i.v. (Perfusor)", bes: "Starker Vasokonstriktor." },
-    { name: "Paracetamol", wirkstoff: "Perfalgan", ind: "Leichte Schmerzen, Fieber", ki: "Leberinsuffizienz", erw: "1g i.v. (Infusion 15 Min)", kind: "15 mg/kg i.v.", app: "i.v. | p.o. | supp.", bes: "Max 4g/Tag bei Erwachsenen." },
-    { name: "Piritramid", wirkstoff: "Dipidolor", ind: "Posttraumatische Schmerzen", ki: "Atemdepression", erw: "7,5 - 15 mg i.v.", kind: "0,05 - 0,1 mg/kg i.v.", app: "i.v.", bes: "Geringeres Emesis-Risiko als Morphin." },
-    { name: "Propofol", wirkstoff: "Disoprivan", ind: "Narkoseeinleitung, Sedierung", ki: "Soja-/Eiallergie, instabiler Kreislauf", erw: "1,5 - 2,5 mg/kg i.v.", kind: "2,5 - 4 mg/kg i.v.", app: "i.v.", bes: "Wirkt rein hypnotisch (nicht schmerzlindernd!)" },
-    { name: "Ringer Lactat", wirkstoff: "Vollelektrolytlösung", ind: "Flüssigkeitsersatz", ki: "Schweres Schädel-Hirn-Trauma", erw: "Nach Bedarf", kind: "20 ml/kg KG", app: "i.v.", bes: "Lactat wird in der Leber metabolisiert." },
-    { name: "Sufentanil", wirkstoff: "Sufenta", ind: "Narkoseeinleitung", ki: "Atemdepression", erw: "10 - 20 µg i.v.", kind: "0,1 - 0,2 µg/kg i.v.", app: "i.v.", bes: "Sehr potent, Opioid-Perfusor Standard." },
-    { name: "Suprarenin", wirkstoff: "Adrenalin", ind: "Reanimation, Anaphylaxie, Pseudokrupp", ki: "Keine im Notfall", erw: "Rea: 1mg i.v. | Anaph: 0,5mg i.m.", kind: "Rea: 0,01mg/kg i.v.", app: "i.v. | i.m. | Inhal.", bes: "Standard: 1mg auf 10ml NaCl (1:10.000)." },
-    { name: "TXA", wirkstoff: "Tranexamsäure", ind: "Starke Blutungen (Trauma < 3h)", ki: "Niereninsuffizienz, Thrombose", erw: "1g i.v. (Kurzinfusion)", kind: "15 - 30 mg/kg i.v.", app: "i.v.", bes: "Antifibrinolytikum." },
-    { name: "Urapidil", wirkstoff: "Ebrantil", ind: "Hypertensive Krise", ki: "Aortenstenose", erw: "5 - 12,5 mg i.v. langsam", kind: "Keine Empfehlung", app: "i.v.", bes: "RR-Senkung um max. 20% anstreben." },
-    { name: "Vomex A", wirkstoff: "Dimenhydrinat", ind: "Übelkeit, Erbrechen, Schwindel", ki: "Glaukom, Epilepsie, Kinder < 6kg", erw: "62,5 mg i.v. (1 Amp.)", kind: "1,25 mg/kg i.v.", app: "i.v.", bes: "Kann starke Schläfrigkeit verursachen." }
+    { name: "Adenosin", wirkstoff: "Adrekar", wirkung: "Blockiert AV-Leitung / stoppt Tachykardie (AV-Blockierend)", ind: "AV-Reentry-Tachykardien", ki: "Asthma, AV-Block II/III", erw: "6mg -> 12mg -> 12mg i.v. (schnell!)", kind: "0,1 mg/kg", app: "i.v. (herznah)", bes: "Kurze Asystolie möglich. Patient vorwarnen!" },
+    { name: "Amiodaron", wirkstoff: "Cordarex", wirkung: "Stabilisiert Herzrhythmus (Antiarrhythmikum)", ind: "Reanimation (VF/pVT), Tachyarrhythmien", ki: "Bradykardie, Jodallergie", erw: "Rea: 300mg i.v. | Tachy: 300mg Kurzinfusion", kind: "5 mg/kg i.v.", app: "i.v.", bes: "Nur mit Glucose 5% verdünnen (falls Infusion)." },
+    { name: "Amoxicillin", wirkstoff: "Antibiotikum", wirkung: "Tötet Bakterien ab (Bakterizid)", ind: "Bakterielle Infektionen", ki: "Penicillin-Allergie", erw: "Nach ärztlicher Anordnung", kind: "Dosis nach Gewicht", app: "p.o. | i.v.", bes: "Anaphylaxie-Gefahr beachten." },
+    { name: "ASS", wirkstoff: "Aspirin", wirkung: "Verhindert Verklumpen der Blutplättchen (Thrombozytenaggregationshemmer)", ind: "ACS / Herzinfarkt", ki: "Magenulkus, Blutung, Asthma", erw: "250 - 500 mg i.v.", kind: "Keine Anwendung", app: "i.v. | p.o.", bes: "Hemmt Thrombozytenaggregation dauerhaft." },
+    { name: "Atropin", wirkstoff: "Atropinsulfat", wirkung: "Steigert Herzfrequenz (Positiv chronotrop / Parasympatholytikum)", ind: "Bradykardie, Antidot (Alkylphosphate)", ki: "Glaukom, Tachyarrhythmie", erw: "0,5 mg i.v. (bis max. 3mg)", kind: "0,01 - 0,02 mg/kg i.v.", app: "i.v.", bes: "Wirkt parasympatholytisch." },
+    { name: "Buscopan", wirkstoff: "Butylscopolamin", wirkung: "Löst Krämpfe der glatten Muskulatur (Spasmolytikum)", ind: "Koliken (Galle/Niere), Spasmen", ki: "Glaukom, Tachykardie", erw: "20 mg i.v. langsam", kind: "0,3 - 0,6 mg/kg i.v.", app: "i.v.", bes: "Kann Sehstörungen/Tachykardie verursachen." },
+    { name: "Esketamin", wirkstoff: "Ketanest S", wirkung: "Schmerzausschaltung & Narkose (Dissoziatives Anästhetikum / Analgetikum)", ind: "Traumaschmerz, Narkose, Status Asthmaticus", ki: "ACS, Hypertonie > 180", erw: "0,125 - 0,25 mg/kg i.v.", kind: "0,25 - 0,5 mg/kg i.v./i.n.", app: "i.v. | i.n.", bes: "Immer mit Midazolam kombinieren (Alpträume)." },
+    { name: "Fentanyl", wirkstoff: "Fentanyl", wirkung: "Starke Schmerzlinderung (Opioid-Analgetikum)", ind: "Stärkste Schmerzen, Narkose", ki: "Ateminsuffizienz", erw: "0,05 - 0,1 mg i.v.", kind: "1 - 2 µg/kg i.v.", app: "i.v.", bes: "Stark atemdepressiv. Naloxon bereithalten." },
+    { name: "Flumazenil", wirkstoff: "Anexate", wirkung: "Hebt Benzo-Wirkung auf (Benzodiazepin-Antagonist)", ind: "Antidot für Benzodiazepine", ki: "Mischintox mit trizykl. Antidepressiva", erw: "0,2 mg i.v. (titriert)", kind: "0,01 mg/kg i.v.", app: "i.v.", bes: "Kurze Wirkdauer (Re-Sedierung beachten)." },
+    { name: "Ibuprofen", wirkstoff: "Nurofen", wirkung: "Schmerzstillend & Entzündungshemmend (NSAR / Antiphlogistikum)", ind: "Leichte/Mittelstarke Schmerzen, Fieber", ki: "Magenblutung, 3. Trimenon Schwangerschaft", erw: "400 - 800 mg p.o.", kind: "10 mg/kg p.o./supp.", app: "p.o. | supp.", bes: "NSAR-Klasse." },
+    { name: "Jonosteril", wirkstoff: "Isotone Vollelektrolytlösung", wirkung: "Füllt Flüssigkeitsspeicher auf (Isotone Volumensubstitution)", ind: "Flüssigkeitsersatz, Trägerlösung", ki: "Lungenödem", erw: "Nach Bedarf", kind: "20 ml/kg KG", app: "i.v.", bes: "Kristalloide Lösung der Wahl." },
+    { name: "Metamizol", wirkstoff: "Novalgin", wirkung: "Schmerzstillend & Fiebersenkend (Analgetikum / Antipyretikum / Spasmolytikum)", ind: "Koliken, hohes Fieber, Schmerz", ki: "Asthma, Schwangerschaft", erw: "1g i.v. (Kurzinfusion)", kind: "10-15 mg/kg i.v.", app: "i.v.", bes: "Gefahr des Blutdruckabfalls bei schneller Gabe." },
+    { name: "Midazolam / Versed", wirkstoff: "Dormicum / Versed", wirkung: "Beruhigend & Krampfösend (Sedativum / Anxiolytikum / Antikonvulsivum)", ind: "Krampfanfall, Sedierung, Angst", ki: "Atemdepression, Schock", erw: "Krampf: 10mg i.n. / 2-5mg i.v.", kind: "0,1 mg/kg i.v. / 0,2 mg/kg i.n.", app: "i.v. | i.n. | i.m.", bes: "Wirkungseintritt i.n. ca. 2-3 Min." },
+    { name: "Morphin", wirkstoff: "Morphinsulfat", wirkung: "Schmerzstillend & Vorlastsenkend (Opioid-Analgetikum)", ind: "Starke Schmerzen, Lungenödem", ki: "Hypotonie, Ateminsuffizienz", erw: "2 - 5 mg i.v. titriert", kind: "0,1 mg/kg i.v.", app: "i.v.", bes: "Standard in der Analgesie." },
+    { name: "NaCl 0,9%", wirkstoff: "Kochsalzlösung", wirkung: "Trägerlösung / Spülung (Isotone Kochsalzlösung)", ind: "Spüllösung, Trägerlösung", ki: "Keine", erw: "Nach Bedarf", kind: "Nach Bedarf", app: "i.v.", bes: "Nicht als Volumenersatz bei Schock (Azidosegefahr)." },
+    { name: "Nalbuphin", wirkstoff: "Nalpain", wirkung: "Schmerzstillend (Opioid-Agonist-Antagonist)", ind: "Mittelstarke Schmerzen", ki: "Schwere Leberinsuffizienz", erw: "10 - 20 mg i.v.", kind: "0,1 - 0,2 mg/kg i.v.", app: "i.v.", bes: "Mischanagonist/-antagonist am Opioidrezeptor." },
+    { name: "Naloxon", wirkstoff: "Narcanti", wirkung: "Hebt Opioid-Wirkung auf (Opioid-Antagonist)", ind: "Antidot für Opioide", ki: "Bekannte Abhängigkeit (Entzug)", erw: "0,1 - 0,4 mg i.v. titriert", kind: "0,01 mg/kg i.v.", app: "i.v. | i.n.", bes: "Wirkt kürzer als many Opioide!" },
+    { name: "Noradrenalin", wirkstoff: "Arterenol", wirkung: "Engt Gefäße ein / hebt Blutdruck (Vasokonstriktor)", ind: "Septischer Schock, neurogener Schock", ki: "Keine im vitalen Notfall", erw: "0,1 - 1 µg/kg/min (Perfusor)", kind: "Nur nach Rücksprache", app: "i.v. (Perfusor)", bes: "Starker Vasokonstriktor." },
+    { name: "Paracetamol", wirkstoff: "Perfalgan", wirkung: "Schmerzstillend & Fiebersenkend (Analgetikum / Antipyretikum)", ind: "Leichte Schmerzen, Fieber", ki: "Leberinsuffizienz", erw: "1g i.v. (Infusion 15 Min)", kind: "15 mg/kg i.v.", app: "i.v. | p.o. | supp.", bes: "Max 4g/Tag bei Erwachsenen." },
+    { name: "Piritramid", wirkstoff: "Dipidolor", wirkung: "Schmerzstillend (Opioid-Analgetikum)", ind: "Posttraumatische Schmerzen", ki: "Atemdepression", erw: "7,5 - 15 mg i.v.", kind: "0,05 - 0,1 mg/kg i.v.", app: "i.v.", bes: "Geringeres Emesis-Risiko als Morphin." },
+    { name: "Propofol", wirkstoff: "Disoprivan", wirkung: "Schlafinduzierend (Hypnotikum)", ind: "Narkoseeinleitung, Sedierung", ki: "Soja-/Eiallergie, instabiler Kreislauf", erw: "1,5 - 2,5 mg/kg i.v.", kind: "2,5 - 4 mg/kg i.v.", app: "i.v.", bes: "Wirkt rein hypnotisch (nicht schmerzlindernd!)" },
+    { name: "Ringer Lactat", wirkstoff: "Vollelektrolytlösung", wirkung: "Flüssigkeitsersatz (Isotone Volumensubstitution)", ind: "Flüssigkeitsersatz", ki: "Schweres Schädel-Hirn-Trauma", erw: "Nach Bedarf", kind: "20 ml/kg KG", app: "i.v.", bes: "Lactat wird in der Leber metabolisiert." },
+    { name: "Sufentanil", wirkstoff: "Sufenta", wirkung: "Stärkste Schmerzlinderung (Hochpotentes Opioid-Analgetikum)", ind: "Narkoseeinleitung", ki: "Atemdepression", erw: "10 - 20 µg i.v.", kind: "0,1 - 0,2 µg/kg i.v.", app: "i.v.", bes: "Sehr potent, Opioid-Perfusor Standard." },
+    { name: "Suprarenin", wirkstoff: "Adrenalin", wirkung: "Steigert HF, Kraft & verengt Gefäße (Katecholamin / Alpha- & Betastimulation)", ind: "Reanimation, Anaphylaxie, Pseudokrupp", ki: "Keine im Notfall", erw: "Rea: 1mg i.v. | Anaph: 0,5mg i.m.", kind: "Rea: 0,01mg/kg i.v.", app: "i.v. | i.m. | Inhal.", bes: "Standard: 1mg auf 10ml NaCl (1:10.000)." },
+    { name: "TXA", wirkstoff: "Tranexamsäure", wirkung: "Stoppt Blutabbau (Antifibrinolytikum)", ind: "Starke Blutungen (Trauma < 3h)", ki: "Niereninsuffizienz, Thrombose", erw: "1g i.v. (Kurzinfusion)", kind: "15 - 30 mg/kg i.v.", app: "i.v.", bes: "Antifibrinolytikum." },
+    { name: "Urapidil", wirkstoff: "Ebrantil", wirkung: "Senkt Blutdruck (Alpha-1-Blocker / Antihypertonikum)", ind: "Hypertensive Krise", ki: "Aortenstenose", erw: "5 - 12,5 mg i.v. langsam", kind: "Keine Empfehlung", app: "i.v.", bes: "RR-Senkung um max. 20% anstreben." },
+    { name: "Vomex A", wirkstoff: "Dimenhydrinat", wirkung: "Unterdrückt Übelkeit (Antiemetikum / H1-Blocker)", ind: "Übelkeit, Erbrechen, Schwindel", ki: "Glaukom, Epilepsie, Kinder < 6kg", erw: "62,5 mg i.v. (1 Amp.)", kind: "1,25 mg/kg i.v.", app: "i.v.", bes: "Kann starke Schläfrigkeit verursachen." }
 ].sort((a, b) => a.name.localeCompare(b.name));
-
-const calc_meds = {
-    "esketamin": { name: "Esketamin (Analgesie)", dose: 0.125, konz: 5, label: "0,125 mg/kg" },
-    "propofol": { name: "Propofol (Narkose)", dose: 2, konz: 10, label: "2 mg/kg" },
-    "fentanyl": { name: "Fentanyl (Kind)", dose: 0.002, konz: 0.05, label: "2 µg/kg" },
-    "midazolam": { name: "Midazolam / Versed", dose: 0.2, konz: 1, label: "0,2 mg/kg" },
-    "morphin": { name: "Morphin", dose: 0.1, konz: 1, label: "0,1 mg/kg" },
-    "piritramid": { name: "Piritramid", dose: 0.1, konz: 7.5, label: "0,1 mg/kg" },
-    "paracetamol": { name: "Paracetamol", dose: 15, konz: 10, label: "15 mg/kg" },
-    "vomex": { name: "Vomex A", dose: 1.25, konz: 12.5, label: "1,25 mg/kg" }
-};
 
 function render(type) {
     const container = document.getElementById('med-container');
@@ -254,6 +244,7 @@ function render(type) {
                 <span>${m.name.toUpperCase()} <small>(${m.wirkstoff})</small></span>
             </div>
             <div class="grid-row">
+                <div class="section-box wirkung"><div class="section-title">Wirkung</div>${m.wirkung}</div>
                 <div class="section-box indikation"><div class="section-title">Indikation</div>${m.ind}</div>
                 <div class="section-box ki"><div class="section-title">Kontraindikation</div>${m.ki}</div>
             </div>
@@ -291,6 +282,17 @@ function renderCalculator() {
         </div>
     `;
 }
+
+const calc_meds = {
+    "esketamin": { name: "Esketamin (Analgesie)", dose: 0.125, konz: 5, label: "0,125 mg/kg" },
+    "propofol": { name: "Propofol (Narkose)", dose: 2, konz: 10, label: "2 mg/kg" },
+    "fentanyl": { name: "Fentanyl (Kind)", dose: 0.002, konz: 0.05, label: "2 µg/kg" },
+    "midazolam": { name: "Midazolam / Versed", dose: 0.2, konz: 1, label: "0,2 mg/kg" },
+    "morphin": { name: "Morphin", dose: 0.1, konz: 1, label: "0,1 mg/kg" },
+    "piritramid": { name: "Piritramid", dose: 0.1, konz: 7.5, label: "0,1 mg/kg" },
+    "paracetamol": { name: "Paracetamol", dose: 15, konz: 10, label: "15 mg/kg" },
+    "vomex": { name: "Vomex A", dose: 1.25, konz: 12.5, label: "1,25 mg/kg" }
+};
 
 function calculate() {
     const medKey = document.getElementById('calcMed').value;
