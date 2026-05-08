@@ -14,6 +14,7 @@
             --bg-light: #f8f9fa;
             --white: #ffffff;
             --accent-red: #e74c3c;
+            --falken-blue: #000e2b; /* Aus Dienstplan übernommen */
         }
 
         body { 
@@ -26,7 +27,6 @@
             background-color: var(--white);
             padding: 20px;
             text-align: center;
-            border-bottom: 4px solid var(--uks-blue-dark);
         }
 
         .logo-container img {
@@ -34,20 +34,53 @@
             height: auto;
         }
 
-        .admin-section {
-            background: var(--uks-blue-dark);
+        /* Navigationsleiste aus Dienstplan */
+        .nav-bar {
+            background-color: var(--uks-blue-dark);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 0 20px 0;
+            border-bottom: 5px solid var(--uks-gold);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: transparent;
             color: white;
+            border: 2px solid var(--uks-gold);
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background-color: var(--uks-gold);
+            color: var(--uks-blue-dark);
+        }
+
+        .admin-section {
+            background: #e9ecef;
+            color: var(--uks-blue-dark);
             padding: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 15px;
+            border-bottom: 1px solid #ddd;
         }
 
         .admin-section input[type="password"] {
             padding: 5px;
             border-radius: 4px;
-            border: none;
+            border: 1px solid #ccc;
         }
 
         .status-badge {
@@ -55,7 +88,7 @@
             border-radius: 20px;
             font-size: 0.85em;
             font-weight: bold;
-            background: rgba(255,255,255,0.1);
+            background: #ddd;
         }
 
         .main-container {
@@ -87,7 +120,6 @@
             color: var(--uks-blue-dark);
             font-weight: bold;
             text-transform: uppercase;
-            cursor: move; /* Zeigt Verschiebbarkeit an */
         }
 
         .category-row td.cat-text {
@@ -97,88 +129,34 @@
             letter-spacing: 2px;
         }
 
-        .category-row td.cat-delete {
-            border-bottom: 2px solid var(--uks-gold);
-            text-align: right;
-        }
-
         td {
             padding: 10px;
             border-bottom: 1px solid #eee;
-            position: relative;
-        }
-
-        /* Drag & Drop Styles */
-        .sortable-ghost {
-            opacity: 0.3;
-            background-color: var(--uks-blue-light) !important;
         }
 
         .drag-handle {
             cursor: grab;
             margin-right: 10px;
             color: #ccc;
-            font-weight: bold;
-            user-select: none;
         }
-
-        .drag-handle:active { cursor: grabbing; }
 
         input[type="text"], select {
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             width: 90%;
-            box-sizing: border-box;
         }
 
-        .multi-select-container { 
-            position: relative; 
-            width: 100%; 
-        }
-
+        .multi-select-container { position: relative; width: 100%; }
         .multi-select-display { 
-            background: #fff; 
-            border: 1px solid #ddd; 
-            padding: 8px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 0.9em;
-            min-height: 35px;
-            box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+            background: #fff; border: 1px solid #ddd; padding: 8px; 
+            border-radius: 4px; cursor: pointer; font-size: 0.9em; min-height: 35px;
         }
-
         .multi-select-dropdown { 
-            display: none; 
-            position: absolute; 
-            z-index: 9999; 
-            background: white; 
-            border: 1px solid var(--uks-blue-light); 
-            width: 100%; 
-            max-height: 200px; 
-            overflow-y: auto; 
-            border-radius: 0 0 4px 4px; 
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            padding: 5px;
-            top: 100%;
-            left: 0;
-            box-sizing: border-box;
+            display: none; position: absolute; z-index: 9999; background: white; 
+            border: 1px solid var(--uks-blue-light); width: 100%; max-height: 200px; 
+            overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.2); top: 100%;
         }
-
-        .multi-select-dropdown label {
-            display: block;
-            padding: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            border-radius: 3px;
-        }
-
-        .multi-select-dropdown label:hover { background-color: #f0f4f8; }
 
         .locked-input { pointer-events: none; opacity: 0.6; }
         .unlocked .locked-input { pointer-events: auto; opacity: 1; }
@@ -200,6 +178,15 @@
     </div>
 </header>
 
+<!-- Neue Navigationsleiste -->
+<nav class="nav-bar">
+    <a href="index.html" class="nav-btn">🏠 Intranet</a>
+    <a href="medis.html" class="nav-btn">💊 Medikamente</a>
+    <a href="wdb.html" class="nav-btn">📜 Leitlinien</a>
+    <a href="dienstplan.html" class="nav-btn">📅 Dienstplan</a>
+    <a href="personal.html" class="nav-btn active">👥 Personal</a>
+</nav>
+
 <div class="admin-section">
     <strong>Admin-Login:</strong>
     <input type="password" id="pw" placeholder="Passwort...">
@@ -208,6 +195,8 @@
 </div>
 
 <div class="main-container">
+    <h2 style="color: var(--uks-blue-dark); border-left: 5px solid var(--uks-gold); padding-left: 15px;">Personalverwaltung</h2>
+    
     <table id="sortableTable">
         <thead>
             <tr>
@@ -237,29 +226,23 @@
 
     const fachbereiche = ["Allgemeinmedizin", "Innere Medizin", "Chirurgie", "Unfallchirurgie und Orthopädie", "Neurologie und Psychiatrie", "Anästhesiologie und Intensivmed.", "Notfallmedizin", "Pädiatrie", "Palliativmedizin", "Pathologie", "HNO-Heilkunde", "Dermatologie", "Augenheilkunde", "Urologie", "Gynäkologie und Geburtshilfe", "Infektiologie und Immunologie", "Epidemiologie und Medizinethik", "Radiologie", "MKG- und Zahnmedizin", "Anästhesiepflege", "Intensivpflege", "Notfallpflege", "Stationspflege", "Wundmanagement"];
 
-    // Drag & Drop Initialisierung
     const el = document.getElementById('tableBody');
     Sortable.create(el, {
         animation: 150,
-        ghostClass: 'sortable-ghost',
-        handle: 'tr', // Die ganze Zeile dient als Handle
-        onEnd: function() {
-            saveAll(); // Nach dem Verschieben speichern
-        }
+        handle: '.drag-handle',
+        onEnd: function() { saveAll(); }
     });
 
     function saveAll() {
         const rows = [];
         document.querySelectorAll('#tableBody tr').forEach(tr => {
             if (tr.classList.contains('category-row')) {
-                rows.push({ type: 'category', text: tr.querySelector('.cat-text').innerText });
+                rows.push({ type: 'category', text: tr.querySelector('.cat-text').innerText.replace('☰ ', '') });
             } else {
-                rows.push({
-                    type: 'staff',
-                    name: tr.querySelector('input[type="text"]').value,
-                    rang: tr.querySelector('select').value,
-                    fach: tr.querySelector('.multi-select-display').innerText
-                });
+                const nameVal = tr.querySelector('input[type="text"]').value;
+                const rangVal = tr.querySelector('select').value;
+                const fachVal = tr.querySelector('.multi-select-display').innerText;
+                rows.push({ type: 'staff', name: nameVal, rang: rangVal, fach: fachVal });
             }
         });
         localStorage.setItem('uks_data_final', JSON.stringify(rows));
@@ -270,9 +253,8 @@
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
         if (!data) {
-            renderCategory("--- Kollegiale Führung ---");
+            renderCategory("--- Klinikleitung ---");
             renderCategory("--- Ärztliches Personal ---");
-            renderCategory("--- Pflegepersonal ---");
         } else {
             data.forEach(item => {
                 if (item.type === 'category') renderCategory(item.text);
@@ -287,6 +269,7 @@
             document.querySelectorAll('.locked-input').forEach(el => el.classList.remove('locked-input'));
             document.getElementById('status').innerText = "🟢 Schreibberechtigt";
             document.getElementById('status').style.background = "#27ae60";
+            document.getElementById('status').style.color = "white";
         } else { alert("Passwort falsch!"); }
     }
 
@@ -300,10 +283,10 @@
         }
 
         row.innerHTML = `
-            <td><span class="drag-handle">☰</span><input type="text" value="${name}" oninput="saveAll()"></td>
-            <td><select onchange="saveAll()">${options}</select></td>
+            <td><span class="drag-handle">☰</span><input type="text" class="locked-input" value="${name}" oninput="saveAll()"></td>
+            <td><select class="locked-input" onchange="saveAll()">${options}</select></td>
             <td>
-                <div class="multi-select-container">
+                <div class="multi-select-container locked-input">
                     <div class="multi-select-display" onclick="toggleDropdown(this)">${selFach}</div>
                     <div class="multi-select-dropdown">
                         ${fachbereiche.map(f => `
@@ -313,7 +296,7 @@
                     </div>
                 </div>
             </td>
-            <td><button class="btn-delete" onclick="this.parentElement.parentElement.remove(); saveAll();">✖</button></td>
+            <td><button class="btn-delete locked-input" onclick="this.parentElement.parentElement.remove(); saveAll();">✖</button></td>
         `;
         document.getElementById('tableBody').appendChild(row);
     }
@@ -323,7 +306,7 @@
         row.className = "category-row";
         row.innerHTML = `
             <td colspan="3" class="cat-text"><span class="drag-handle">☰</span> ${name}</td>
-            <td class="cat-delete"><button class="btn-delete" onclick="this.parentElement.parentElement.remove(); saveAll();">✖</button></td>
+            <td class="cat-delete"><button class="btn-delete locked-input" onclick="this.parentElement.parentElement.remove(); saveAll();">✖</button></td>
         `;
         document.getElementById('tableBody').appendChild(row);
     }
@@ -333,9 +316,7 @@
     
     function toggleDropdown(el) {
         const dropdown = el.nextElementSibling;
-        const isOpen = dropdown.style.display === 'block';
-        document.querySelectorAll('.multi-select-dropdown').forEach(d => d.style.display = 'none');
-        dropdown.style.display = isOpen ? 'none' : 'block';
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     }
     
     function updateDisplay(cb) {
