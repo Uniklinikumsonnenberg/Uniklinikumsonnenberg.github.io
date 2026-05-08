@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personalverwaltung - Universitätsklinikum Sonnenberg</title>
-    <!-- SortableJS für Drag & Drop Funktionalität -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         :root {
@@ -14,7 +13,6 @@
             --bg-light: #f8f9fa;
             --white: #ffffff;
             --accent-red: #e74c3c;
-            --falken-blue: #000e2b; /* Aus Dienstplan übernommen */
         }
 
         body { 
@@ -34,7 +32,7 @@
             height: auto;
         }
 
-        /* Navigationsleiste aus Dienstplan */
+        /* Navigationsleiste */
         .nav-bar {
             background-color: var(--uks-blue-dark);
             display: flex;
@@ -97,12 +95,13 @@
             margin: 0 auto;
         }
 
+        /* Tabellen Styling für exakte Ausrichtung */
         table {
             width: 100%;
             border-collapse: collapse;
             background: white;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-radius: 8px;
+            table-layout: fixed; /* Verhindert das Springen der Spaltenbreiten */
         }
 
         th {
@@ -115,59 +114,101 @@
             letter-spacing: 1px;
         }
 
-        .category-row {
-            background-color: #f1f1f1 !important;
-            color: var(--uks-blue-dark);
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .category-row td.cat-text {
-            padding: 12px 20px;
-            border-bottom: 2px solid var(--uks-gold);
-            text-align: center;
-            letter-spacing: 2px;
-        }
-
+        /* Alle Zelleninhalte auf eine Ebene bringen */
         td {
-            padding: 10px;
+            padding: 8px 10px;
             border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        /* Flex-Container für Spalte 1 (Handle + Input) */
+        .flex-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .drag-handle {
             cursor: grab;
-            margin-right: 10px;
             color: #ccc;
+            font-size: 1.2em;
+            user-select: none;
+            min-width: 20px;
         }
 
-        input[type="text"], select {
-            padding: 8px;
+        /* Einheitliche Höhe für alle interaktiven Elemente */
+        input[type="text"], 
+        select, 
+        .multi-select-display {
+            height: 38px;
+            box-sizing: border-box;
             border: 1px solid #ddd;
             border-radius: 4px;
-            width: 90%;
+            width: 100%;
+            font-size: 0.95em;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            background-color: white;
         }
 
+        /* Kategorie-Zeilen */
+        .category-row {
+            background-color: #f8f9fa !important;
+        }
+
+        .cat-text {
+            color: var(--uks-blue-dark);
+            font-weight: bold;
+            text-align: center !important;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--uks-gold) !important;
+        }
+
+        /* Multi-Select Spezialitäten */
         .multi-select-container { position: relative; width: 100%; }
         .multi-select-display { 
-            background: #fff; border: 1px solid #ddd; padding: 8px; 
-            border-radius: 4px; cursor: pointer; font-size: 0.9em; min-height: 35px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .multi-select-dropdown { 
             display: none; position: absolute; z-index: 9999; background: white; 
-            border: 1px solid var(--uks-blue-light); width: 100%; max-height: 200px; 
+            border: 1px solid var(--uks-blue-light); width: 100%; max-height: 250px; 
             overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.2); top: 100%;
+            padding: 5px;
         }
+        .multi-select-dropdown label {
+            display: block;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
+        .multi-select-dropdown label:hover { background: #f0f0f0; }
 
-        .locked-input { pointer-events: none; opacity: 0.6; }
-        .unlocked .locked-input { pointer-events: auto; opacity: 1; }
+        /* Sperre-Logik */
+        .locked-input { pointer-events: none; opacity: 0.7; filter: grayscale(0.5); }
+        .unlocked .locked-input { pointer-events: auto; opacity: 1; filter: none; }
 
         .btn-add {
             background-color: var(--uks-blue-dark);
-            color: white; border: none; padding: 10px 20px;
+            color: white; border: none; padding: 12px 24px;
             border-radius: 4px; cursor: pointer; font-weight: bold;
+            margin-right: 10px;
         }
         
-        .btn-delete { color: var(--accent-red); background: none; border: none; cursor: pointer; font-size: 1.2em; }
+        .btn-delete { 
+            color: var(--accent-red); 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 1.4em; 
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -178,7 +219,6 @@
     </div>
 </header>
 
-<!-- Neue Navigationsleiste -->
 <nav class="nav-bar">
     <a href="index.html" class="nav-btn">🏠 Intranet</a>
     <a href="medis.html" class="nav-btn">💊 Medikamente</a>
@@ -201,17 +241,17 @@
         <thead>
             <tr>
                 <th style="width: 30%;">Vollständiger Name</th>
-                <th style="width: 30%;">Position / Dienstgrad</th>
-                <th style="width: 35%;">Fachbereiche</th>
+                <th style="width: 25%;">Position / Dienstgrad</th>
+                <th style="width: 40%;">Fachbereiche</th>
                 <th style="width: 5%;"></th>
             </tr>
         </thead>
         <tbody id="tableBody"></tbody>
     </table>
 
-    <div style="margin-top: 20px; display: flex; gap: 10px;">
-        <button class="btn-add locked-input" onclick="addRow()">+ Mitarbeiter</button>
-        <button class="btn-add locked-input" onclick="addCategory()" style="background-color: var(--uks-blue-light);">+ Kategorie</button>
+    <div style="margin-top: 25px;">
+        <button class="btn-add locked-input" onclick="addRow()">+ Mitarbeiter hinzufügen</button>
+        <button class="btn-add locked-input" onclick="addCategory()" style="background-color: var(--uks-blue-light);">+ Kategorie einfügen</button>
     </div>
 </div>
 
@@ -224,7 +264,7 @@
         "Verwaltung": ["Verwaltungsmitarbeiter", "Empfangsdienst", "Hausmeister", "Reinigungskraft"]
     };
 
-    const fachbereiche = ["Allgemeinmedizin", "Innere Medizin", "Chirurgie", "Unfallchirurgie und Orthopädie", "Neurologie und Psychiatrie", "Anästhesiologie und Intensivmed.", "Notfallmedizin", "Pädiatrie", "Palliativmedizin", "Pathologie", "HNO-Heilkunde", "Dermatologie", "Augenheilkunde", "Urologie", "Gynäkologie und Geburtshilfe", "Infektiologie und Immunologie", "Epidemiologie und Medizinethik", "Radiologie", "MKG- und Zahnmedizin", "Anästhesiepflege", "Intensivpflege", "Notfallpflege", "Stationspflege", "Wundmanagement"];
+    const fachbereiche = ["Allgemeinmedizin", "Innere Medizin", "Chirurgie", "Unfallchirurgie und Orthopädie", "Neurologie und Psychiatrie", "Anästhesiologie und Intensivmed.", "Notfallmedizin", "Pädiatrie", "Palliativmedizin", "Pathologie", "HNO-Heilkunde", "Dermatologie", "Augenheilkunde", "Urologie", "Gynäkologie und Geburtshilfe", "Infektiologie und Immunologie", "Epidemiologie und Medizinethik", "Radiologie", "MKG- und Zahnmedizin", "Anästhesiepflege", "Intensivpflege", "Notfallpflege", "Stationspflege", "Wundmanagement", "In Ausbildung"];
 
     const el = document.getElementById('tableBody');
     Sortable.create(el, {
@@ -237,24 +277,26 @@
         const rows = [];
         document.querySelectorAll('#tableBody tr').forEach(tr => {
             if (tr.classList.contains('category-row')) {
-                rows.push({ type: 'category', text: tr.querySelector('.cat-text').innerText.replace('☰ ', '') });
+                rows.push({ type: 'category', text: tr.querySelector('.cat-text').innerText.replace('☰ ', '').trim() });
             } else {
-                const nameVal = tr.querySelector('input[type="text"]').value;
-                const rangVal = tr.querySelector('select').value;
-                const fachVal = tr.querySelector('.multi-select-display').innerText;
-                rows.push({ type: 'staff', name: nameVal, rang: rangVal, fach: fachVal });
+                rows.push({
+                    type: 'staff',
+                    name: tr.querySelector('input[type="text"]').value,
+                    rang: tr.querySelector('select').value,
+                    fach: tr.querySelector('.multi-select-display').innerText
+                });
             }
         });
-        localStorage.setItem('uks_data_final', JSON.stringify(rows));
+        localStorage.setItem('uks_data_v3', JSON.stringify(rows));
     }
 
     function loadAll() {
-        const data = JSON.parse(localStorage.getItem('uks_data_final'));
+        const data = JSON.parse(localStorage.getItem('uks_data_v3'));
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
         if (!data) {
-            renderCategory("--- Klinikleitung ---");
-            renderCategory("--- Ärztliches Personal ---");
+            renderCategory("--- KOLLEGIALE FÜHRUNG ---");
+            renderCategory("--- ÄRZTLICHES PERSONAL ---");
         } else {
             data.forEach(item => {
                 if (item.type === 'category') renderCategory(item.text);
@@ -283,7 +325,12 @@
         }
 
         row.innerHTML = `
-            <td><span class="drag-handle">☰</span><input type="text" class="locked-input" value="${name}" oninput="saveAll()"></td>
+            <td>
+                <div class="flex-cell">
+                    <span class="drag-handle">☰</span>
+                    <input type="text" class="locked-input" value="${name}" oninput="saveAll()">
+                </div>
+            </td>
             <td><select class="locked-input" onchange="saveAll()">${options}</select></td>
             <td>
                 <div class="multi-select-container locked-input">
@@ -305,18 +352,24 @@
         const row = document.createElement('tr');
         row.className = "category-row";
         row.innerHTML = `
-            <td colspan="3" class="cat-text"><span class="drag-handle">☰</span> ${name}</td>
+            <td colspan="3" class="cat-text">
+                <div class="flex-cell" style="justify-content: center;">
+                    <span class="drag-handle">☰</span> ≡ ≡ ≡ ≡ ${name} ≡ ≡ ≡ ≡
+                </div>
+            </td>
             <td class="cat-delete"><button class="btn-delete locked-input" onclick="this.parentElement.parentElement.remove(); saveAll();">✖</button></td>
         `;
         document.getElementById('tableBody').appendChild(row);
     }
 
     function addRow() { renderStaffRow(); saveAll(); }
-    function addCategory() { const n = prompt("Kategorie:"); if(n) { renderCategory(n); saveAll(); } }
+    function addCategory() { const n = prompt("Kategorie Name:"); if(n) { renderCategory(n); saveAll(); } }
     
     function toggleDropdown(el) {
         const dropdown = el.nextElementSibling;
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        const isOpen = dropdown.style.display === 'block';
+        document.querySelectorAll('.multi-select-dropdown').forEach(d => d.style.display = 'none');
+        dropdown.style.display = isOpen ? 'none' : 'block';
     }
     
     function updateDisplay(cb) {
