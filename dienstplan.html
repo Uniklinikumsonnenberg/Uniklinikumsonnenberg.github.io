@@ -15,7 +15,6 @@
             /* Arzt-Farben */
             --color-mueller: #e74c3c;
             --color-white: #3498db;
-            --color-wolf: #9b59b6;
             --color-kiese: #2ecc71;
             --color-empty: #bdc3c7;
         }
@@ -34,7 +33,6 @@
 
         .logo { height: 120px; margin-bottom: 10px; }
 
-        /* Navigation Style */
         .nav-bar {
             background-color: var(--falken-blue);
             display: flex;
@@ -132,7 +130,6 @@
 
         .p-mueller { background-color: var(--color-mueller); }
         .p-white { background-color: var(--color-white); }
-        .p-wolf { background-color: var(--color-wolf); }
         .p-kiese { background-color: var(--color-kiese); }
         
         .weekend { color: #e74c3c; font-weight: bold; }
@@ -173,7 +170,7 @@
     </table>
 
     <p style="margin-top: 20px; font-size: 0.85em; color: #666; font-style: italic;">
-        * Logik: Bei einer Personalstärke von 4 Personen werden primär die ZNA (Doppelbesetzung), das NEF 82/1 und der RTH besetzt. Das (NEF 82/2) verbleibt im Standby.
+        * Logik: Bei einer Personalstärke von 3 Personen werden primär die ZNA (Doppelbesetzung) und das NEF 82/1 besetzt. RTH und das Reserve-NEF verbleiben im Standby.
     </p>
 </div>
 
@@ -204,13 +201,12 @@
             const tr = document.createElement('tr');
             if (isToday) tr.className = 'today';
 
-            // Faire Rotation: Die Startposition verschiebt sich jeden Tag um 1
-            const p1 = aerzte[(day + 0) % 4]; // ZNA Pos 1
-            const p2 = aerzte[(day + 1) % 4]; // ZNA Pos 2
-            const p3 = aerzte[(day + 2) % 4]; // NEF 82/1
-            const p4 = aerzte[(day + 3) % 4]; // RTH Christoph
+            // Faire Rotation basierend auf 3 Personen (% 3)
+            const p1 = aerzte[(day + 0) % 3]; // ZNA Pos 1
+            const p2 = aerzte[(day + 1) % 3]; // ZNA Pos 2
+            const p3 = aerzte[(day + 2) % 3]; // NEF 82/1
             
-            // Rufbereitschaft wird rollierend von einem der ZNA-Ärzte übernommen
+            // Rufbereitschaft wird vom ersten ZNA-Arzt übernommen
             const ruf = p1; 
 
             tr.innerHTML = `
@@ -221,7 +217,7 @@
                     <span class="badge ${p2.class}">${p2.name}</span>
                 </td>
                 <td><span class="badge ${p3.class}">${p3.name}</span></td>
-                <td><span class="badge ${p4.class}">${p4.name}</span></td>
+                <td><span class="badge badge-empty">Standby</span></td>
                 <td><span class="badge badge-empty">Standby</span></td>
                 <td><span class="badge ${ruf.class}">${ruf.name}</span></td>
             `;
