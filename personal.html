@@ -7,39 +7,42 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         :root {
-            --uks-blue-dark: #003865;
-            --uks-blue-light: #6c99c6;
-            --uks-gold: #fdb913;
-            --bg-light: #f8f9fa;
+            --falken-blue: #000e2b;
+            --falken-gold: #ffd700;
+            --bg-light: #f4f4f4;
             --white: #ffffff;
             --accent-red: #e74c3c;
         }
 
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Helvetica', Arial, sans-serif; 
             background-color: var(--bg-light); 
             margin: 0; padding: 0; 
+            color: #333;
         }
 
         header {
-            background-color: var(--white);
+            background-color: var(--falken-blue);
             padding: 20px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .logo-container img {
-            max-width: 250px;
-            height: auto;
+            height: 120px;
+            width: auto;
+            margin-bottom: 10px;
         }
 
-        /* Navigationsleiste */
         .nav-bar {
-            background-color: var(--uks-blue-dark);
+            background-color: var(--falken-blue);
             display: flex;
             justify-content: center;
             gap: 10px;
             padding: 10px 0 20px 0;
-            border-bottom: 5px solid var(--uks-gold);
+            border-bottom: 5px solid var(--falken-gold);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -49,7 +52,7 @@
             padding: 10px 20px;
             background-color: transparent;
             color: white;
-            border: 2px solid var(--uks-gold);
+            border: 2px solid var(--falken-gold);
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
@@ -60,13 +63,12 @@
         }
 
         .nav-btn:hover, .nav-btn.active {
-            background-color: var(--uks-gold);
-            color: var(--uks-blue-dark);
+            background-color: var(--falken-gold);
+            color: var(--falken-blue);
         }
 
         .admin-section {
             background: #e9ecef;
-            color: var(--uks-blue-dark);
             padding: 12px;
             display: flex;
             justify-content: center;
@@ -76,147 +78,146 @@
         }
 
         .admin-section input[type="password"] {
-            padding: 5px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 20px;
+            border: 2px solid var(--falken-gold);
+            outline: none;
         }
 
         .status-badge {
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.85em;
             font-weight: bold;
-            background: #ddd;
+            background: #ccc;
         }
 
         .main-container {
             padding: 30px;
-            max-width: 1400px;
+            max-width: 1300px;
             margin: 0 auto;
         }
 
-        /* Tabellen Styling für exakte Ausrichtung */
+        /* Tabellen Korrekturen für Dropdowns */
+        .table-wrapper {
+            background: white;
+            border: 2px solid var(--falken-blue);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            /* Wichtig: Kein overflow:hidden hier! */
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            table-layout: fixed; /* Verhindert das Springen der Spaltenbreiten */
+            table-layout: fixed;
         }
 
         th {
-            background-color: var(--uks-blue-dark);
-            color: var(--uks-gold);
+            background-color: #f5f5f5;
+            color: var(--falken-blue);
             padding: 15px;
             text-align: left;
             text-transform: uppercase;
             font-size: 0.85em;
-            letter-spacing: 1px;
+            border-bottom: 2px solid var(--falken-blue);
         }
 
-        /* Alle Zelleninhalte auf eine Ebene bringen */
         td {
-            padding: 8px 10px;
+            padding: 10px;
             border-bottom: 1px solid #eee;
             vertical-align: middle;
-        }
-
-        /* Flex-Container für Spalte 1 (Handle + Input) */
-        .flex-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            position: relative; /* Basis für absolutes Dropdown */
+            overflow: visible !important; /* Damit Dropdown nicht abgeschnitten wird */
         }
 
         .drag-handle {
             cursor: grab;
-            color: #ccc;
+            color: #bbb;
             font-size: 1.2em;
-            user-select: none;
-            min-width: 20px;
+            padding-right: 10px;
         }
 
-        /* Einheitliche Höhe für alle interaktiven Elemente */
-        input[type="text"], 
-        select, 
-        .multi-select-display {
+        input[type="text"], select, .multi-select-display {
             height: 38px;
             box-sizing: border-box;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             border-radius: 4px;
             width: 100%;
             font-size: 0.95em;
             padding: 0 10px;
+            background-color: white;
             display: flex;
             align-items: center;
-            background-color: white;
         }
 
-        /* Kategorie-Zeilen */
-        .category-row {
-            background-color: #f8f9fa !important;
+        .category-row { background-color: var(--falken-gold) !important; }
+        .cat-text { color: var(--falken-blue); font-weight: bold; text-align: center !important; text-transform: uppercase; }
+
+        /* MULTI-SELECT FIX */
+        .multi-select-container { 
+            position: relative; 
+            width: 100%;
         }
 
-        .cat-text {
-            color: var(--uks-blue-dark);
-            font-weight: bold;
-            text-align: center !important;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border-bottom: 2px solid var(--uks-gold) !important;
-        }
-
-        /* Multi-Select Spezialitäten */
-        .multi-select-container { position: relative; width: 100%; }
         .multi-select-display { 
-            cursor: pointer;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            cursor: pointer; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            border: 1px solid #ccc;
         }
+
         .multi-select-dropdown { 
-            display: none; position: absolute; z-index: 9999; background: white; 
-            border: 1px solid var(--uks-blue-light); width: 100%; max-height: 250px; 
-            overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.2); top: 100%;
+            display: none; 
+            position: absolute; 
+            z-index: 9999; /* Sehr hoch setzen */
+            background: white; 
+            border: 2px solid var(--falken-blue); 
+            width: 100%; 
+            max-height: 250px; 
+            overflow-y: auto; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3); 
+            top: 100%; 
+            left: 0;
             padding: 5px;
+            box-sizing: border-box;
         }
+
         .multi-select-dropdown label {
-            display: block;
-            padding: 5px;
+            display: flex;
+            align-items: center;
+            padding: 8px 5px;
             cursor: pointer;
-            font-size: 0.85em;
+            font-size: 0.9em;
+            transition: background 0.2s;
         }
+
         .multi-select-dropdown label:hover { background: #f0f0f0; }
+        .multi-select-dropdown input { margin-right: 10px; }
 
         /* Sperre-Logik */
-        .locked-input { pointer-events: none; opacity: 0.7; filter: grayscale(0.5); }
-        .unlocked .locked-input { pointer-events: auto; opacity: 1; filter: none; }
+        .locked-input { pointer-events: none; opacity: 0.6; }
+        .unlocked .locked-input { pointer-events: auto; opacity: 1; }
 
         .btn-add {
-            background-color: var(--uks-blue-dark);
-            color: white; border: none; padding: 12px 24px;
-            border-radius: 4px; cursor: pointer; font-weight: bold;
-            margin-right: 10px;
+            background-color: var(--falken-blue);
+            color: white; border: 2px solid var(--falken-gold);
+            padding: 12px 24px; border-radius: 5px; cursor: pointer;
+            font-weight: bold; text-transform: uppercase; margin: 10px;
+            transition: 0.3s;
         }
         
-        .btn-delete { 
-            color: var(--accent-red); 
-            background: none; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 1.4em; 
-            display: block;
-            width: 100%;
-            text-align: center;
-        }
+        .btn-add:hover:not(.locked-input) { background-color: var(--falken-gold); color: var(--falken-blue); }
+        .btn-delete { color: var(--accent-red); background: none; border: none; cursor: pointer; font-size: 1.4em; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="logo-container">
-        <img src="https://r2.fivemanage.com/duNnRRRqkxrMPfikEWhQR/Bild_2026-05-04_224551624.png" alt="UKS Logo">
+        <img src="https://r2.fivemanage.com/duNnRRRqkxrMPfikEWhQR/Bild_2026-05-04_224551624.png" alt="Logo">
     </div>
+    <h1 style="color: white; margin: 0; letter-spacing: 2px; text-transform: uppercase; font-size: 1.5em;">Personalverwaltung</h1>
 </header>
 
 <nav class="nav-bar">
@@ -230,41 +231,40 @@
 <div class="admin-section">
     <strong>Admin-Login:</strong>
     <input type="password" id="pw" placeholder="Passwort...">
-    <button style="background-color: var(--uks-gold); color: var(--uks-blue-dark); border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;" onclick="unlock()">Freischalten</button>
+    <button style="background-color: var(--falken-gold); color: var(--falken-blue); border: none; padding: 7px 15px; border-radius: 20px; font-weight: bold; cursor: pointer;" onclick="unlock()">Freischalten</button>
     <span id="status" class="status-badge">🔴 Gesperrt</span>
 </div>
 
 <div class="main-container">
-    <h2 style="color: var(--uks-blue-dark); border-left: 5px solid var(--uks-gold); padding-left: 15px;">Personalverwaltung</h2>
-    
-    <table id="sortableTable">
-        <thead>
-            <tr>
-                <th style="width: 30%;">Vollständiger Name</th>
-                <th style="width: 25%;">Position / Dienstgrad</th>
-                <th style="width: 40%;">Fachbereiche</th>
-                <th style="width: 5%;"></th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
+    <div class="table-wrapper">
+        <table id="sortableTable">
+            <thead>
+                <tr>
+                    <th style="width: 30%;">Name</th>
+                    <th style="width: 25%;">Dienstgrad</th>
+                    <th style="width: 40%;">Fachbereiche</th>
+                    <th style="width: 5%;"></th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
 
-    <div style="margin-top: 25px;">
-        <button class="btn-add locked-input" onclick="addRow()">+ Mitarbeiter hinzufügen</button>
-        <button class="btn-add locked-input" onclick="addCategory()" style="background-color: var(--uks-blue-light);">+ Kategorie einfügen</button>
+    <div style="margin-top: 25px; text-align: center;">
+        <button class="btn-add locked-input" onclick="addRow()">+ Mitarbeiter</button>
+        <button class="btn-add locked-input" onclick="addCategory()" style="border-color: white;">+ Kategorie</button>
     </div>
 </div>
 
 <script>
     const rangStruktur = {
-        "Klinikleitung": ["Ärztlicher Direktor", "Stellv. Ärztlicher Direktor", "Verwaltungsdirektion", "Stellv. Verwaltungsdirektion", "Pflegedirektion", "Stellv. Pflegedienstleitung"],
+        "Klinikleitung": ["Ärztlicher Direktor", "Stellv. Ärztlicher Direktor", "Verwaltungsdirektion", "Pflegedirektion"],
         "Ärztliches Personal": ["Chefarzt", "Ltd. Oberarzt", "Oberarzt", "Facharzt", "Assistenzarzt", "Medizinstudent"],
-        "Pflegepersonal": ["Bereichsleitung ZNA", "Bereichsleitung OP", "Bereichsleitung ITS", "Bereichsleitung Stationspflege", "Bereichsleitung Ambulanzen", "Pflegefachkraft", "Pflegehelfer", "Praktikant"],
-        "Nicht-Ärztlich": ["Psychotherapeut", "MTA für Radiologie", "MTA für Labor", "Physiotherapeut"],
-        "Verwaltung": ["Verwaltungsmitarbeiter", "Empfangsdienst", "Hausmeister", "Reinigungskraft"]
+        "Pflegepersonal": ["Bereichsleitung", "Pflegefachkraft", "Pflegehelfer", "Praktikant"],
+        "Weitere": ["Psychotherapeut", "Physiotherapeut", "Verwaltung", "Hausmeister"]
     };
 
-    const fachbereiche = ["Allgemeinmedizin", "Innere Medizin", "Chirurgie", "Unfallchirurgie und Orthopädie", "Neurologie und Psychiatrie", "Anästhesiologie und Intensivmed.", "Notfallmedizin", "Pädiatrie", "Palliativmedizin", "Pathologie", "HNO-Heilkunde", "Dermatologie", "Augenheilkunde", "Urologie", "Gynäkologie und Geburtshilfe", "Infektiologie und Immunologie", "Epidemiologie und Medizinethik", "Radiologie", "MKG- und Zahnmedizin", "Anästhesiepflege", "Intensivpflege", "Notfallpflege", "Stationspflege", "Wundmanagement", "In Ausbildung"];
+        const fachbereiche = ["Allgemeinmedizin", "Innere Medizin", "Chirurgie", "Unfallchirurgie und Orthopädie", "Neurologie und Psychiatrie", "Anästhesiologie und Intensivmed.", "Notfallmedizin", "Pädiatrie", "Palliativmedizin", "Pathologie", "HNO-Heilkunde", "Dermatologie", "Augenheilkunde", "Urologie", "Gynäkologie und Geburtshilfe", "Infektiologie und Immunologie", "Epidemiologie und Medizinethik", "Radiologie", "MKG- und Zahnmedizin", "Anästhesiepflege", "Intensivpflege", "Notfallpflege", "Stationspflege", "Wundmanagement", "In Ausbildung"];
 
     const el = document.getElementById('tableBody');
     Sortable.create(el, {
@@ -273,46 +273,14 @@
         onEnd: function() { saveAll(); }
     });
 
-    function saveAll() {
-        const rows = [];
-        document.querySelectorAll('#tableBody tr').forEach(tr => {
-            if (tr.classList.contains('category-row')) {
-                rows.push({ type: 'category', text: tr.querySelector('.cat-text').innerText.replace('☰ ', '').trim() });
-            } else {
-                rows.push({
-                    type: 'staff',
-                    name: tr.querySelector('input[type="text"]').value,
-                    rang: tr.querySelector('select').value,
-                    fach: tr.querySelector('.multi-select-display').innerText
-                });
-            }
-        });
-        localStorage.setItem('uks_data_v3', JSON.stringify(rows));
-    }
-
-    function loadAll() {
-        const data = JSON.parse(localStorage.getItem('uks_data_v3'));
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-        if (!data) {
-            renderCategory("--- KOLLEGIALE FÜHRUNG ---");
-            renderCategory("--- ÄRZTLICHES PERSONAL ---");
-        } else {
-            data.forEach(item => {
-                if (item.type === 'category') renderCategory(item.text);
-                else renderStaffRow(item.name, item.rang, item.fach);
-            });
-        }
-    }
-
     function unlock() {
         if(document.getElementById('pw').value === "admin123") {
             document.body.classList.add('unlocked');
             document.querySelectorAll('.locked-input').forEach(el => el.classList.remove('locked-input'));
-            document.getElementById('status').innerText = "🟢 Schreibberechtigt";
-            document.getElementById('status').style.background = "#27ae60";
-            document.getElementById('status').style.color = "white";
-        } else { alert("Passwort falsch!"); }
+            const s = document.getElementById('status');
+            s.innerText = "🟢 Schreibberechtigt";
+            s.style.background = "#27ae60"; s.style.color = "white";
+        } else { alert("Falsches Passwort!"); }
     }
 
     function renderStaffRow(name = "", selRang = "", selFach = "Wählen...") {
@@ -326,19 +294,21 @@
 
         row.innerHTML = `
             <td>
-                <div class="flex-cell">
+                <div style="display:flex; align-items:center;">
                     <span class="drag-handle">☰</span>
                     <input type="text" class="locked-input" value="${name}" oninput="saveAll()">
                 </div>
             </td>
             <td><select class="locked-input" onchange="saveAll()">${options}</select></td>
-            <td>
+            <td style="overflow: visible;">
                 <div class="multi-select-container locked-input">
-                    <div class="multi-select-display" onclick="toggleDropdown(this)">${selFach}</div>
+                    <div class="multi-select-display" onclick="toggleDropdown(event, this)">${selFach}</div>
                     <div class="multi-select-dropdown">
                         ${fachbereiche.map(f => `
-                            <label><input type="checkbox" value="${f}" ${selFach.includes(f)?'checked':''} 
-                            onchange="updateDisplay(this); saveAll();"> ${f}</label>
+                            <label>
+                                <input type="checkbox" value="${f}" ${selFach.includes(f)?'checked':''} 
+                                onchange="updateDisplay(this); saveAll();"> ${f}
+                            </label>
                         `).join('')}
                     </div>
                 </div>
@@ -353,33 +323,63 @@
         row.className = "category-row";
         row.innerHTML = `
             <td colspan="3" class="cat-text">
-                <div class="flex-cell" style="justify-content: center;">
-                    <span class="drag-handle">☰</span> ≡ ≡ ≡ ≡ ${name} ≡ ≡ ≡ ≡
-                </div>
+                <span class="drag-handle">☰</span> --- ${name} ---
             </td>
-            <td class="cat-delete"><button class="btn-delete locked-input" onclick="this.parentElement.parentElement.remove(); saveAll();">✖</button></td>
+            <td><button class="btn-delete locked-input" onclick="this.parentElement.parentElement.remove(); saveAll();">✖</button></td>
         `;
         document.getElementById('tableBody').appendChild(row);
     }
 
-    function addRow() { renderStaffRow(); saveAll(); }
-    function addCategory() { const n = prompt("Kategorie Name:"); if(n) { renderCategory(n); saveAll(); } }
-    
-    function toggleDropdown(el) {
+    function toggleDropdown(event, el) {
+        event.stopPropagation();
         const dropdown = el.nextElementSibling;
         const isOpen = dropdown.style.display === 'block';
         document.querySelectorAll('.multi-select-dropdown').forEach(d => d.style.display = 'none');
         dropdown.style.display = isOpen ? 'none' : 'block';
     }
-    
+
     function updateDisplay(cb) {
         const cont = cb.closest('.multi-select-container');
         const chk = Array.from(cont.querySelectorAll('input:checked')).map(c => c.value);
         cont.querySelector('.multi-select-display').innerText = chk.length > 0 ? chk.join(', ') : "Wählen...";
     }
 
+    function saveAll() {
+        const rows = [];
+        document.querySelectorAll('#tableBody tr').forEach(tr => {
+            if (tr.classList.contains('category-row')) {
+                rows.push({ type: 'category', text: tr.querySelector('.cat-text').innerText.replace('☰', '').replace(/-/g, '').trim() });
+            } else {
+                rows.push({
+                    type: 'staff',
+                    name: tr.querySelector('input[type="text"]').value,
+                    rang: tr.querySelector('select').value,
+                    fach: tr.querySelector('.multi-select-display').innerText
+                });
+            }
+        });
+        localStorage.setItem('uks_personal_final', JSON.stringify(rows));
+    }
+
+    function loadAll() {
+        const data = JSON.parse(localStorage.getItem('uks_personal_final'));
+        document.getElementById('tableBody').innerHTML = "";
+        if (!data) {
+            renderCategory("KOLLEGIALE FÜHRUNG");
+            renderStaffRow("Dr. Med. Sonnenberg", "Ärztlicher Direktor", "Notfallmedizin");
+        } else {
+            data.forEach(item => {
+                if (item.type === 'category') renderCategory(item.text);
+                else renderStaffRow(item.name, item.rang, item.fach);
+            });
+        }
+    }
+
+    function addRow() { renderStaffRow(); saveAll(); }
+    function addCategory() { const n = prompt("Kategorie Name:"); if(n) { renderCategory(n); saveAll(); } }
+
     window.onclick = e => {
-        if (!e.target.matches('.multi-select-display') && !e.target.closest('.multi-select-dropdown')) {
+        if (!e.target.closest('.multi-select-container')) {
             document.querySelectorAll('.multi-select-dropdown').forEach(d => d.style.display = 'none');
         }
     }
