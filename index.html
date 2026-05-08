@@ -39,7 +39,7 @@
             width: 90%;
             margin: 40px auto;
             display: grid;
-            /* Definiert zwei Spalten */
+            /* Erzeugt zwei gleich breite Spalten */
             grid-template-columns: 1fr 1fr; 
             gap: 25px;
         }
@@ -66,12 +66,8 @@
             border-color: var(--falken-gold);
         }
 
-        /* Spezial-Regel für die Pyramiden-Form (die 3. Karte) */
-        .dashboard-card:last-child {
-            grid-column: span 2; /* Nimmt den Platz von 2 Spalten ein */
-            justify-self: center; /* Zentriert die Karte in diesem Platz */
-            width: calc(50% - 12.5px); /* Macht sie exakt so breit wie die anderen (50% minus halber Gap) */
-        }
+        /* Die spezial-Regel für die Pyramide wurde entfernt, 
+           damit alle Karten gleich behandelt werden */
 
         .icon { 
             font-size: 4em; 
@@ -94,10 +90,6 @@
         @media (max-width: 600px) {
             .container { 
                 grid-template-columns: 1fr; 
-            }
-            .dashboard-card:last-child {
-                grid-column: span 1;
-                width: 100%;
             }
         }
 
@@ -139,7 +131,7 @@
         <div class="card-desc">Dienstpläne & Ansprechpartner</div>
     </a>
 
-        <a href="personal.html" class="dashboard-card">
+    <a href="personal.html" class="dashboard-card">
         <div class="icon">👥</div>
         <div class="card-title">Personalverwaltung</div>
         <div class="card-desc">Mitarbeiterliste</div>
