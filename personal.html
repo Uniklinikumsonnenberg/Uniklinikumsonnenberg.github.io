@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personalverwaltung - Universitätsklinikum Sonnenberg</title>
+    <title>Personalverwaltung - UKS Sonnenberg</title>
     
-    <!-- Firebase SDKs -->
+    <!-- FIREBASE COMPAT SDKs (Diese Reihenfolge ist kritisch!) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     
-    <!-- Sortable JS -->
+    <!-- Sortable JS für Drag & Drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     
     <style>
@@ -37,11 +37,7 @@
             align-items: center;
         }
 
-        .logo-container img {
-            height: 120px;
-            width: auto;
-            margin-bottom: 10px;
-        }
+        .logo-container img { height: 120px; width: auto; margin-bottom: 10px; }
 
         .nav-bar {
             background-color: var(--falken-blue);
@@ -111,11 +107,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 
         th {
             background-color: #f5f5f5;
@@ -135,12 +127,7 @@
             overflow: visible !important;
         }
 
-        .drag-handle {
-            cursor: grab;
-            color: #bbb;
-            font-size: 1.2em;
-            padding-right: 10px;
-        }
+        .drag-handle { cursor: grab; color: #bbb; font-size: 1.2em; padding-right: 10px; }
 
         input[type="text"], select, .multi-select-display {
             height: 38px;
@@ -229,7 +216,7 @@
 </div>
 
 <script>
-    // --- FIREBASE SETUP ---
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
       apiKey: "AIzaSyBFh41RWefmwmNE_F_NRPv2WnTfgZDEGZk",
       authDomain: "realtime-database-8a623.firebaseapp.com",
@@ -240,6 +227,7 @@
       appId: "1:808024997653:web:83a9c53a27554dcebef31c"
     };
 
+    // Initialisierung
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -252,25 +240,7 @@
 
     const fachbereiche = ["Allgemeinmedizin", "Innere Medizin", "Chirurgie", "Unfallchirurgie und Orthopädie", "Neurologie und Psychiatrie", "Anästhesiologie und Intensivmed.", "Notfallmedizin", "Pädiatrie", "Palliativmedizin", "Pathologie", "HNO-Heilkunde", "Dermatologie", "Augenheilkunde", "Urologie", "Gynäkologie und Geburtshilfe", "Infektiologie und Immunologie", "Epidemiologie und Medizinethik", "Radiologie", "MKG- und Zahnmedizin", "Anästhesiepflege", "Intensivpflege", "Notfallpflege", "Stationspflege", "Wundmanagement", "In Ausbildung"];
 
-    // --- SORTABLE INITIALISIERUNG ---
-    const el = document.getElementById('tableBody');
-    Sortable.create(el, {
-        animation: 150,
-        handle: '.drag-handle',
-        onEnd: function() { saveToFirebase(); }
-    });
-
-    function unlock() {
-        if(document.getElementById('pw').value === "admin123") {
-            document.body.classList.add('unlocked');
-            document.querySelectorAll('.locked-input').forEach(el => el.classList.remove('locked-input'));
-            const s = document.getElementById('status');
-            s.innerText = "🟢 Schreibberechtigt";
-            s.style.background = "#27ae60"; s.style.color = "white";
-        } else { alert("Falsches Passwort!"); }
-    }
-
-    // --- RENDER FUNKTIONEN ---
+    // --- RENDER LOGIK ---
     function renderStaffRow(name = "", selRang = "", selFach = "Wählen...") {
         const row = document.createElement('tr');
         let options = "";
@@ -318,7 +288,17 @@
         document.getElementById('tableBody').appendChild(row);
     }
 
-    // --- LOGIK & STORAGE ---
+    // --- FUNKTIONEN ---
+    function unlock() {
+        if(document.getElementById('pw').value === "admin123") {
+            document.body.classList.add('unlocked');
+            document.querySelectorAll('.locked-input').forEach(el => el.classList.remove('locked-input'));
+            const s = document.getElementById('status');
+            s.innerText = "🟢 Schreibberechtigt";
+            s.style.background = "#27ae60"; s.style.color = "white";
+        } else { alert("Falsches Passwort!"); }
+    }
+
     function toggleDropdown(event, el) {
         event.stopPropagation();
         const dropdown = el.nextElementSibling;
@@ -333,19 +313,15 @@
         cont.querySelector('.multi-select-display').innerText = chk.length > 0 ? chk.join(', ') : "Wählen...";
     }
 
-    // Speichern in Firebase
+    // --- FIREBASE STORAGE ---
     let saveTimeout;
     function saveToFirebase() {
         clearTimeout(saveTimeout);
-        // Kleiner Delay, damit die Datenbank nicht bei jedem Tastendruck überlastet wird
         saveTimeout = setTimeout(() => {
             const rows = [];
             document.querySelectorAll('#tableBody tr').forEach(tr => {
                 if (tr.classList.contains('category-row')) {
-                    rows.push({ 
-                        type: 'category', 
-                        text: tr.querySelector('.cat-text').innerText.replace('☰', '').replace(/-/g, '').trim() 
-                    });
+                    rows.push({ type: 'category', text: tr.querySelector('.cat-text').innerText.replace('☰', '').replace(/-/g, '').trim() });
                 } else {
                     rows.push({
                         type: 'staff',
@@ -355,33 +331,37 @@
                     });
                 }
             });
-            db.ref('personal_data').set(rows);
-        }, 500);
+            db.ref('personal_data').set(rows).catch(err => console.error("Fehler beim Speichern:", err));
+        }, 800);
     }
 
-    // Laden aus Firebase (Echtzeit)
     function loadFromFirebase() {
         db.ref('personal_data').on('value', (snapshot) => {
+            if (document.body.classList.contains('unlocked')) return; // Nicht während Admin-Edit überschreiben
+            
             const data = snapshot.val();
-            // Nur neu rendern, wenn man nicht gerade im Schreibmodus (unlocked) ist, 
-            // um Cursor-Sprünge beim Tippen zu verhindern.
-            if (!document.body.classList.contains('unlocked')) {
-                document.getElementById('tableBody').innerHTML = "";
-                if (!data) {
-                    renderCategory("KOLLEGIALE FÜHRUNG");
-                    renderStaffRow("Dr. Med. Sonnenberg", "Ärztlicher Direktor", "Notfallmedizin");
-                } else {
-                    data.forEach(item => {
-                        if (item.type === 'category') renderCategory(item.text);
-                        else renderStaffRow(item.name, item.rang, item.fach);
-                    });
-                }
+            document.getElementById('tableBody').innerHTML = "";
+            if (!data) {
+                renderCategory("NEUE ABTEILUNG");
+                renderStaffRow("Beispiel Name", "Assistenzarzt", "Notfallmedizin");
+            } else {
+                data.forEach(item => {
+                    if (item.type === 'category') renderCategory(item.text);
+                    else renderStaffRow(item.name, item.rang, item.fach);
+                });
             }
         });
     }
 
     function addRow() { renderStaffRow(); saveToFirebase(); }
     function addCategory() { const n = prompt("Kategorie Name:"); if(n) { renderCategory(n); saveToFirebase(); } }
+
+    // Initialisierung von Sortable nach dem Laden
+    Sortable.create(document.getElementById('tableBody'), {
+        animation: 150,
+        handle: '.drag-handle',
+        onEnd: function() { saveToFirebase(); }
+    });
 
     window.onclick = e => {
         if (!e.target.closest('.multi-select-container')) {
