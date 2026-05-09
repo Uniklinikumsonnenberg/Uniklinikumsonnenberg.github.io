@@ -4,7 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personalverwaltung - Universitätsklinikum Sonnenberg</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    
+    <!-- Sortable JS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
     <style>
         :root {
             --falken-blue: #000e2b;
@@ -98,12 +105,10 @@
             margin: 0 auto;
         }
 
-        /* Tabellen Korrekturen für Dropdowns */
         .table-wrapper {
             background: white;
             border: 2px solid var(--falken-blue);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            /* Wichtig: Kein overflow:hidden hier! */
         }
 
         table {
@@ -126,8 +131,8 @@
             padding: 10px;
             border-bottom: 1px solid #eee;
             vertical-align: middle;
-            position: relative; /* Basis für absolutes Dropdown */
-            overflow: visible !important; /* Damit Dropdown nicht abgeschnitten wird */
+            position: relative;
+            overflow: visible !important;
         }
 
         .drag-handle {
@@ -153,49 +158,16 @@
         .category-row { background-color: var(--falken-gold) !important; }
         .cat-text { color: var(--falken-blue); font-weight: bold; text-align: center !important; text-transform: uppercase; }
 
-        /* MULTI-SELECT FIX */
-        .multi-select-container { 
-            position: relative; 
-            width: 100%;
-        }
-
-        .multi-select-display { 
-            cursor: pointer; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            border: 1px solid #ccc;
-        }
-
+        .multi-select-container { position: relative; width: 100%; }
+        .multi-select-display { cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid #ccc; }
         .multi-select-dropdown { 
-            display: none; 
-            position: absolute; 
-            z-index: 9999; /* Sehr hoch setzen */
-            background: white; 
-            border: 2px solid var(--falken-blue); 
-            width: 100%; 
-            max-height: 250px; 
-            overflow-y: auto; 
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3); 
-            top: 100%; 
-            left: 0;
-            padding: 5px;
-            box-sizing: border-box;
+            display: none; position: absolute; z-index: 9999; background: white; 
+            border: 2px solid var(--falken-blue); width: 100%; max-height: 250px; 
+            overflow-y: auto; box-shadow: 0 8px 16px rgba(0,0,0,0.3); top: 100%; left: 0; padding: 5px; box-sizing: border-box;
         }
-
-        .multi-select-dropdown label {
-            display: flex;
-            align-items: center;
-            padding: 8px 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background 0.2s;
-        }
-
-        .multi-select-dropdown label:hover { background: #f0f0f0; }
+        .multi-select-dropdown label { display: flex; align-items: center; padding: 8px 5px; cursor: pointer; font-size: 0.9em; }
         .multi-select-dropdown input { margin-right: 10px; }
 
-        /* Sperre-Logik */
         .locked-input { pointer-events: none; opacity: 0.6; }
         .unlocked .locked-input { pointer-events: auto; opacity: 1; }
 
@@ -206,7 +178,6 @@
             font-weight: bold; text-transform: uppercase; margin: 10px;
             transition: 0.3s;
         }
-        
         .btn-add:hover:not(.locked-input) { background-color: var(--falken-gold); color: var(--falken-blue); }
         .btn-delete { color: var(--accent-red); background: none; border: none; cursor: pointer; font-size: 1.4em; }
     </style>
@@ -258,6 +229,20 @@
 </div>
 
 <script>
+    // --- FIREBASE SETUP ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBFh41RWefmwmNE_F_NRPv2WnTfgZDEGZk",
+      authDomain: "realtime-database-8a623.firebaseapp.com",
+      databaseURL: "https://realtime-database-8a623-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "realtime-database-8a623",
+      storageBucket: "realtime-database-8a623.firebasestorage.app",
+      messagingSenderId: "808024997653",
+      appId: "1:808024997653:web:83a9c53a27554dcebef31c"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     const rangStruktur = {
         "Klinikleitung": ["Ärztlicher Direktor", "Stellv. Ärztlicher Direktor", "Verwaltungsdirektion", "Pflegedirektion"],
         "Ärztliches Personal": ["Chefarzt", "Ltd. Oberarzt", "Oberarzt", "Facharzt", "Assistenzarzt", "Medizinstudent"],
@@ -265,13 +250,14 @@
         "Weitere": ["Psychotherapeut", "Physiotherapeut", "Verwaltung", "Hausmeister"]
     };
 
-        const fachbereiche = ["Allgemeinmedizin", "Innere Medizin", "Chirurgie", "Unfallchirurgie und Orthopädie", "Neurologie und Psychiatrie", "Anästhesiologie und Intensivmed.", "Notfallmedizin", "Pädiatrie", "Palliativmedizin", "Pathologie", "HNO-Heilkunde", "Dermatologie", "Augenheilkunde", "Urologie", "Gynäkologie und Geburtshilfe", "Infektiologie und Immunologie", "Epidemiologie und Medizinethik", "Radiologie", "MKG- und Zahnmedizin", "Anästhesiepflege", "Intensivpflege", "Notfallpflege", "Stationspflege", "Wundmanagement", "In Ausbildung"];
+    const fachbereiche = ["Allgemeinmedizin", "Innere Medizin", "Chirurgie", "Unfallchirurgie und Orthopädie", "Neurologie und Psychiatrie", "Anästhesiologie und Intensivmed.", "Notfallmedizin", "Pädiatrie", "Palliativmedizin", "Pathologie", "HNO-Heilkunde", "Dermatologie", "Augenheilkunde", "Urologie", "Gynäkologie und Geburtshilfe", "Infektiologie und Immunologie", "Epidemiologie und Medizinethik", "Radiologie", "MKG- und Zahnmedizin", "Anästhesiepflege", "Intensivpflege", "Notfallpflege", "Stationspflege", "Wundmanagement", "In Ausbildung"];
 
+    // --- SORTABLE INITIALISIERUNG ---
     const el = document.getElementById('tableBody');
     Sortable.create(el, {
         animation: 150,
         handle: '.drag-handle',
-        onEnd: function() { saveAll(); }
+        onEnd: function() { saveToFirebase(); }
     });
 
     function unlock() {
@@ -284,6 +270,7 @@
         } else { alert("Falsches Passwort!"); }
     }
 
+    // --- RENDER FUNKTIONEN ---
     function renderStaffRow(name = "", selRang = "", selFach = "Wählen...") {
         const row = document.createElement('tr');
         let options = "";
@@ -297,10 +284,10 @@
             <td>
                 <div style="display:flex; align-items:center;">
                     <span class="drag-handle">☰</span>
-                    <input type="text" class="locked-input" value="${name}" oninput="saveAll()">
+                    <input type="text" class="locked-input" value="${name}" oninput="saveToFirebase()">
                 </div>
             </td>
-            <td><select class="locked-input" onchange="saveAll()">${options}</select></td>
+            <td><select class="locked-input" onchange="saveToFirebase()">${options}</select></td>
             <td style="overflow: visible;">
                 <div class="multi-select-container locked-input">
                     <div class="multi-select-display" onclick="toggleDropdown(event, this)">${selFach}</div>
@@ -308,13 +295,13 @@
                         ${fachbereiche.map(f => `
                             <label>
                                 <input type="checkbox" value="${f}" ${selFach.includes(f)?'checked':''} 
-                                onchange="updateDisplay(this); saveAll();"> ${f}
+                                onchange="updateDisplay(this); saveToFirebase();"> ${f}
                             </label>
                         `).join('')}
                     </div>
                 </div>
             </td>
-            <td><button class="btn-delete locked-input" onclick="this.parentElement.parentElement.remove(); saveAll();">✖</button></td>
+            <td><button class="btn-delete locked-input" onclick="this.parentElement.parentElement.remove(); saveToFirebase();">✖</button></td>
         `;
         document.getElementById('tableBody').appendChild(row);
     }
@@ -326,11 +313,12 @@
             <td colspan="3" class="cat-text">
                 <span class="drag-handle">☰</span> --- ${name} ---
             </td>
-            <td><button class="btn-delete locked-input" onclick="this.parentElement.parentElement.remove(); saveAll();">✖</button></td>
+            <td><button class="btn-delete locked-input" onclick="this.parentElement.parentElement.remove(); saveToFirebase();">✖</button></td>
         `;
         document.getElementById('tableBody').appendChild(row);
     }
 
+    // --- LOGIK & STORAGE ---
     function toggleDropdown(event, el) {
         event.stopPropagation();
         const dropdown = el.nextElementSibling;
@@ -345,46 +333,63 @@
         cont.querySelector('.multi-select-display').innerText = chk.length > 0 ? chk.join(', ') : "Wählen...";
     }
 
-    function saveAll() {
-        const rows = [];
-        document.querySelectorAll('#tableBody tr').forEach(tr => {
-            if (tr.classList.contains('category-row')) {
-                rows.push({ type: 'category', text: tr.querySelector('.cat-text').innerText.replace('☰', '').replace(/-/g, '').trim() });
-            } else {
-                rows.push({
-                    type: 'staff',
-                    name: tr.querySelector('input[type="text"]').value,
-                    rang: tr.querySelector('select').value,
-                    fach: tr.querySelector('.multi-select-display').innerText
-                });
+    // Speichern in Firebase
+    let saveTimeout;
+    function saveToFirebase() {
+        clearTimeout(saveTimeout);
+        // Kleiner Delay, damit die Datenbank nicht bei jedem Tastendruck überlastet wird
+        saveTimeout = setTimeout(() => {
+            const rows = [];
+            document.querySelectorAll('#tableBody tr').forEach(tr => {
+                if (tr.classList.contains('category-row')) {
+                    rows.push({ 
+                        type: 'category', 
+                        text: tr.querySelector('.cat-text').innerText.replace('☰', '').replace(/-/g, '').trim() 
+                    });
+                } else {
+                    rows.push({
+                        type: 'staff',
+                        name: tr.querySelector('input[type="text"]').value,
+                        rang: tr.querySelector('select').value,
+                        fach: tr.querySelector('.multi-select-display').innerText
+                    });
+                }
+            });
+            db.ref('personal_data').set(rows);
+        }, 500);
+    }
+
+    // Laden aus Firebase (Echtzeit)
+    function loadFromFirebase() {
+        db.ref('personal_data').on('value', (snapshot) => {
+            const data = snapshot.val();
+            // Nur neu rendern, wenn man nicht gerade im Schreibmodus (unlocked) ist, 
+            // um Cursor-Sprünge beim Tippen zu verhindern.
+            if (!document.body.classList.contains('unlocked')) {
+                document.getElementById('tableBody').innerHTML = "";
+                if (!data) {
+                    renderCategory("KOLLEGIALE FÜHRUNG");
+                    renderStaffRow("Dr. Med. Sonnenberg", "Ärztlicher Direktor", "Notfallmedizin");
+                } else {
+                    data.forEach(item => {
+                        if (item.type === 'category') renderCategory(item.text);
+                        else renderStaffRow(item.name, item.rang, item.fach);
+                    });
+                }
             }
         });
-        localStorage.setItem('uks_personal_final', JSON.stringify(rows));
     }
 
-    function loadAll() {
-        const data = JSON.parse(localStorage.getItem('uks_personal_final'));
-        document.getElementById('tableBody').innerHTML = "";
-        if (!data) {
-            renderCategory("KOLLEGIALE FÜHRUNG");
-            renderStaffRow("Dr. Med. Sonnenberg", "Ärztlicher Direktor", "Notfallmedizin");
-        } else {
-            data.forEach(item => {
-                if (item.type === 'category') renderCategory(item.text);
-                else renderStaffRow(item.name, item.rang, item.fach);
-            });
-        }
-    }
-
-    function addRow() { renderStaffRow(); saveAll(); }
-    function addCategory() { const n = prompt("Kategorie Name:"); if(n) { renderCategory(n); saveAll(); } }
+    function addRow() { renderStaffRow(); saveToFirebase(); }
+    function addCategory() { const n = prompt("Kategorie Name:"); if(n) { renderCategory(n); saveToFirebase(); } }
 
     window.onclick = e => {
         if (!e.target.closest('.multi-select-container')) {
             document.querySelectorAll('.multi-select-dropdown').forEach(d => d.style.display = 'none');
         }
     }
-    window.onload = loadAll;
+    
+    window.onload = loadFromFirebase;
 </script>
 </body>
 </html>
