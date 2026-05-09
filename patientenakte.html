@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patientenakten - UKS Sonnenberg</title>
+    <style>
+        :root {
+            --falken-blue: #000e2b;
+            --falken-gold: #ffd700;
+            --bg-light: #f4f4f4;
+            --white: #ffffff;
+            --accent-red: #e74c3c;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-light); 
+            margin: 0; padding: 0; 
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* HEADER & NAVIGATION */
+        header { background-color: var(--falken-blue); padding: 30px; text-align: center; }
+        .logo { height: 120px; width: auto; margin-bottom: 10px; }
+        
+        .nav-bar { 
+            background-color: var(--falken-blue); 
+            display: flex; justify-content: center; gap: 15px; 
+            padding: 15px 0; border-bottom: 5px solid var(--falken-gold); 
+            position: sticky; top: 0; z-index: 1000;
+        }
+
+        .nav-btn { 
+            padding: 12px 25px; background-color: transparent; color: white; 
+            border: 2px solid var(--falken-gold); border-radius: 5px; 
+            cursor: pointer; font-weight: bold; text-decoration: none; 
+            text-transform: uppercase; font-size: 1rem; transition: 0.3s;
+        }
+        .nav-btn:hover, .nav-btn.active { background-color: var(--falken-gold); color: var(--falken-blue); }
+
+        /* HAUPTBEREICH */
+        .main-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .action-bar { display: flex; gap: 15px; margin-bottom: 30px; }
+        #patientSearch { 
+            flex-grow: 1; padding: 15px 25px; border-radius: 30px; 
+            border: 2px solid var(--falken-gold); outline: none; font-size: 1.1rem;
+        }
+
+        .btn-main { 
+            background-color: var(--falken-blue); color: white; border: 2px solid var(--falken-gold); 
+            padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem;
+        }
+
+        /* PATIENTEN-KARTE */
+        .patient-file { background: white; border: 2px solid var(--falken-blue); margin-bottom: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        .file-header { background: var(--falken-blue); color: var(--falken-gold); padding: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 1.3rem; font-weight: bold; }
+        
+        .base-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); padding: 25px; gap: 20px; background: #fafafa; border-bottom: 1px solid #eee; }
+        .info-box label { display: block; font-size: 0.8rem; color: #666; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        .info-box span { font-weight: bold; font-size: 1.2rem; display: block; }
+
+        /* BERICHTS-LISTE */
+        .report-section { padding: 25px; }
+        .report-title { font-weight: bold; font-size: 1.2rem; border-left: 5px solid var(--falken-gold); padding-left: 15px; margin-bottom: 20px; color: var(--falken-blue); }
+        .report-card { margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; transition: 0.2s; }
+        .report-header { padding: 15px 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #f8f9fa; }
+        .report-body { padding: 20px; display: none; background: white; white-space: pre-wrap; border-top: 1px solid #eee; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,14,43,0.8); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 40px; border-radius: 12px; width: 95%; max-width: 900px; max-height: 90vh; overflow-y: auto; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: span 2; }
+        
+        label { font-weight: bold; font-size: 0.95rem; display: block; margin-bottom: 8px; color: var(--falken-blue); }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+
+        /* PDF / PRINT STYLES */
+        #pdf-print-area { display: none; }
+
+        @media print {
+            body > *:not(#pdf-print-area) { display: none !important; }
+            #pdf-print-area { 
+                display: block !important; 
+                position: absolute; left: 0; top: 0; width: 100%; 
+                background: white !important; padding: 40px; color: black;
+                font-family: "Times New Roman", Times, serif;
+            }
+            .pdf-letterhead { 
+                display: flex !important; 
+                justify-content: space-between; 
+                align-items: flex-start;
+                border-bottom: 2px solid #000; 
+                padding-bottom: 15px; 
+                margin-bottom: 30px; 
+            }
+            /* Korrektur: Die Schrift oben rechts rückt weiter nach links durch padding-right */
+            .pdf-header-address { 
+                text-align: right; 
+                font-size: 11pt; 
+                padding-right: 50px; 
+            }
+            .pdf-section { margin-bottom: 20px; page-break-inside: avoid; }
+            .pdf-label { font-weight: bold; text-decoration: underline; text-transform: uppercase; display: block; margin-bottom: 5px; font-size: 11pt; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="https://r2.fivemanage.com/duNnRRRqkxrMPfikEWhQR/Bild_2026-05-04_224551624.png" alt="Logo" class="logo">
+</header>
+
+<nav class="nav-bar">
+    <a href="index.html" class="nav-btn">🏠 Home</a>
+    <a href="personal.html" class="nav-btn">👥 Personal</a>
+    <a href="akten.html" class="nav-btn active">📁 Patientenakten</a>
+</nav>
+
+<div class="main-container">
+    <div class="action-bar">
+        <input type="text" id="patientSearch" placeholder="Patient suchen..." onkeyup="searchFiles()">
+        <button class="btn-main" onclick="openModal('patientModal')">+ Neue Akte anlegen</button>
+    </div>
+    <div id="fileContainer"></div>
+</div>
+
+<div id="reportModal" class="modal">
+    <div class="modal-content">
+        <h2 style="color: var(--falken-blue); border-bottom: 3px solid var(--falken-gold);">Bericht / OP erstellen</h2>
+        <input type="hidden" id="activePatientId">
+        
+        <div class="form-grid">
+            <div class="full-width">
+                <label>Berichtstyp wählen</label>
+                <select id="f_type" onchange="toggleOPFields()">
+                    <option value="behandlung">Behandlungsbericht</option>
+                    <option value="op">OP-Bericht</option>
+                </select>
+            </div>
+
+            <div class="full-width">
+                <label id="diagLabel">Hauptdiagnose</label>
+                <input type="text" id="f_hauptdiagnose" placeholder="z.B. Lobärpneumonie">
+            </div>
+
+            <div id="op_fields" class="full-width" style="display: none; background: #fff9db; padding: 15px; border-radius: 8px; border: 1px solid #ffd43b;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div><label>OP-Datum</label><input type="date" id="f_op_date"></div>
+                    <div><label>Eingriff</label><input type="text" id="f_op_name" placeholder="z.B. Appendektomie"></div>
+                </div>
+                <label style="margin-top: 10px;">Detaillierter OP-Verlauf</label>
+                <textarea id="f_op_bericht" placeholder="Schnittführung, Befund, Nahtmaterial..."></textarea>
+            </div>
+
+            <div><label>Zuweisung</label>
+                <select id="f_zuweisung">
+                    <option>Selbstvorstellung</option>
+                    <option>Rettungsdienst (RTW)</option>
+                    <option>Notarzt (NEF)</option>
+                    <option>Einweisung Hausarzt</option>
+                </select>
+            </div>
+            <div><label>Leitsymptom</label><input type="text" id="f_leitsymptom" placeholder="z.B. Thoraxschmerz"></div>
+            
+            <div class="full-width"><label>Anamnese (Vorgeschichte & aktuelles Ereignis)</label>
+            <textarea id="f_anamnese" placeholder="Art, Dauer und Verlauf der Beschwerden..."></textarea></div>
+            
+            <div class="full-width"><label>Körperlicher Befund</label>
+            <textarea id="f_befund" placeholder="Status praesens..."></textarea></div>
+            
+            <div><label>Blutdruck (mmHg)</label><input type="text" id="f_rr" placeholder="120/80"></div>
+            <div><label>Herzfrequenz (bpm)</label><input type="text" id="f_hf" placeholder="80"></div>
+            <div><label>SpO2 (%)</label><input type="text" id="f_spo2" placeholder="98"></div>
+            <div><label>Temperatur (°C)</label><input type="text" id="f_temp" placeholder="36.8"></div>
+            <div class="full-width"><label>Bewusstsein / GCS</label><input type="text" id="f_gcs" placeholder="GCS 15, wach, orientiert"></div>
+            
+            <div class="full-width"><label>Diagnostik (EKG, Labor, Bildgebung)</label>
+            <textarea id="f_diagnostik"></textarea></div>
+            
+            <div class="full-width"><label>Epikrise & Beurteilung</label>
+            <textarea id="f_prozedere"></textarea></div>
+            
+            <div><label>Behandelnder Arzt / Operateur</label><input type="text" id="f_arzt"></div>
+        </div>
+        
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+            <button class="btn-main" onclick="saveReport()">Speichern</button>
+            <button class="btn-main" style="background: #666; border-color: #666;" onclick="closeModal('reportModal')">Abbrechen</button>
+        </div>
+    </div>
+</div>
+
+<div id="patientModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+        <h2 style="color: var(--falken-blue);">Neue Patientenakte</h2>
+        <label>Vollständiger Name</label><input type="text" id="p_name">
+        <label>Geburtsdatum</label><input type="date" id="p_dob">
+        <label>Versicherungsstatus</label><input type="text" id="p_insur">
+        <label>Medizinische Risiken</label><textarea id="p_risk"></textarea>
+        <button class="btn-main" style="width: 100%; margin-top: 20px;" onclick="savePatient()">Patient anlegen</button>
+    </div>
+</div>
+
+<div id="pdf-print-area"></div>
+
+<script>
+    let patients = JSON.parse(localStorage.getItem('uks_full_data')) || [];
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function toggleOPFields() {
+        const type = document.getElementById('f_type').value;
+        const opBox = document.getElementById('op_fields');
+        const diagLabel = document.getElementById('diagLabel');
+        
+        if (type === 'op') {
+            opBox.style.display = 'block';
+            diagLabel.innerText = "Präoperative Diagnose";
+        } else {
+            opBox.style.display = 'none';
+            diagLabel.innerText = "Hauptdiagnose";
+        }
+    }
+
+    function savePatient() {
+        const name = document.getElementById('p_name').value;
+        if(!name) return;
+        const p = {
+            id: Date.now(),
+            name: name,
+            dob: document.getElementById('p_dob').value,
+            insur: document.getElementById('p_insur').value,
+            risk: document.getElementById('p_risk').value,
+            reports: []
+        };
+        patients.push(p);
+        save(); closeModal('patientModal'); render();
+    }
+
+    function saveReport() {
+        const pid = document.getElementById('activePatientId').value;
+        const p = patients.find(x => x.id == pid);
+        const r = {
+            id: Date.now(),
+            date: new Date().toLocaleDateString('de-DE'),
+            type: document.getElementById('f_type').value,
+            diagnose: document.getElementById('f_hauptdiagnose').value,
+            zuweisung: document.getElementById('f_zuweisung').value,
+            leitsymptom: document.getElementById('f_leitsymptom').value,
+            anamnese: document.getElementById('f_anamnese').value,
+            befund: document.getElementById('f_befund').value,
+            vital: `RR: ${document.getElementById('f_rr').value}, HF: ${document.getElementById('f_hf').value}, SpO2: ${document.getElementById('f_spo2').value}%, Temp: ${document.getElementById('f_temp').value}°C, GCS: ${document.getElementById('f_gcs').value}`,
+            diagnostik: document.getElementById('f_diagnostik').value,
+            prozedere: document.getElementById('f_prozedere').value,
+            arzt: document.getElementById('f_arzt').value,
+            opDate: document.getElementById('f_op_date').value,
+            opName: document.getElementById('f_op_name').value,
+            opText: document.getElementById('f_op_bericht').value
+        };
+        p.reports.unshift(r);
+        save(); closeModal('reportModal'); render();
+    }
+
+    function printReport(pid, rid) {
+        const p = patients.find(x => x.id == pid);
+        const r = p.reports.find(x => x.id == rid);
+        const area = document.getElementById('pdf-print-area');
+
+        let reportHeader = r.type === 'op' ? "OP-BERICHT / CHIRURGISCHER ENTLASSBRIEF" : "ÄRZTLICHER ENTLASSBRIEF";
+        
+        let opSection = r.type === 'op' ? `
+            <div class="pdf-section" style="background:#f2f2f2; padding:15px; border:1px solid #000;">
+                <span class="pdf-label">Operation / Eingriff (${r.opDate}):</span>
+                <strong>${r.opName}</strong><br>
+                <p style="font-size: 10pt; margin-top:5px; white-space: pre-wrap;">${r.opText}</p>
+            </div>` : '';
+
+        area.innerHTML = `
+            <div class="pdf-letterhead">
+                <img src="https://r2.fivemanage.com/duNnRRRqkxrMPfikEWhQR/Bild_2026-05-09_130833496.png" style="height: 90px;">
+                <div class="pdf-header-address">
+                    <strong>Universitätsklinikum Sonnenberg</strong><br>
+                    Zentrale Notaufnahme / Chirurgie<br>
+                    Intigrationsstraße, 12345 Sonnenberg
+                </div>
+            </div>
+            <div style="margin-bottom: 20px;">An die Hausarztpraxis von ${p.name}</div>
+            <h2 style="text-align: center; border-bottom: 2px solid black; padding-bottom: 5px;">${reportHeader}</h2>
+            <p><strong>Patient:</strong> ${p.name}, geb. ${p.dob} | <strong>Behandlungstag:</strong> ${r.date}</p>
+            <div class="pdf-section"><span class="pdf-label">Diagnose:</span><strong>${r.diagnose}</strong></div>
+            ${opSection}
+            <div class="pdf-section"><span class="pdf-label">Anamnese:</span>${r.anamnese}</div>
+            <div class="pdf-section"><span class="pdf-label">Befund & Vitalwerte:</span>${r.vital}<br>${r.befund}</div>
+            <div class="pdf-section"><span class="pdf-label">Beurteilung & Epikrise:</span>${r.prozedere}</div>
+            <div style="margin-top: 60px;">
+                Mit freundlichen Grüßen,<br><br>
+                __________________________<br>
+                ${r.arzt} (Zuständiger Fachbereich)
+            </div>
+        `;
+        window.print();
+    }
+
+    function save() { localStorage.setItem('uks_full_data', JSON.stringify(patients)); }
+
+    function render() {
+        const container = document.getElementById('fileContainer');
+        container.innerHTML = '';
+        patients.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'patient-file';
+            div.innerHTML = `
+                <div class="file-header">
+                    <span>📁 ${p.name.toUpperCase()}</span>
+                    <span>GEB. ${p.dob}</span>
+                </div>
+                <div class="base-info">
+                    <div class="info-box"><label>Versicherung</label><span>${p.insur}</span></div>
+                    <div class="info-box"><label>Risiken</label><span style="color:var(--accent-red)">${p.risk || 'Keine'}</span></div>
+                    <div style="text-align: right; grid-column: span 2;">
+                        <button class="btn-main" onclick="document.getElementById('activePatientId').value=${p.id}; openModal('reportModal')">+ NEUER BERICHT / OP</button>
+                        <button onclick="deleteP(${p.id})" style="border:none; background:none; color:red; cursor:pointer; margin-left: 10px;">Löschen</button>
+                    </div>
+                </div>
+                <div class="report-section">
+                    <div class="report-title">BEHANDLUNGSVERLAUF</div>
+                    ${p.reports.map(r => `
+                        <div class="report-card">
+                            <div class="report-header" onclick="toggleReport(this)">
+                                <span>${r.type === 'op' ? '🛠️ OP' : '📝 BERICHT'} - ${r.date} - ${r.diagnose}</span>
+                                <button class="btn-main" style="padding: 5px 15px; font-size: 0.8rem;" onclick="event.stopPropagation(); printReport(${p.id}, ${r.id})">📄 PDF EXPORT</button>
+                            </div>
+                            <div class="report-body">
+                                ${r.type === 'op' ? `<strong>Eingriff:</strong> ${r.opName}<br>` : ''}
+                                <strong>Beurteilung:</strong> ${r.prozedere}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function toggleReport(el) {
+        const body = el.nextElementSibling;
+        body.style.display = body.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function deleteP(id) { if(confirm("Akte wirklich löschen?")) { patients = patients.filter(x => x.id != id); save(); render(); } }
+    
+    function searchFiles() {
+        const val = document.getElementById('patientSearch').value.toLowerCase();
+        document.querySelectorAll('.patient-file').forEach(f => f.style.display = f.innerText.toLowerCase().includes(val) ? 'block' : 'none');
+    }
+
+    window.onload = render;
+</script>
+
+</body>
+</html>
