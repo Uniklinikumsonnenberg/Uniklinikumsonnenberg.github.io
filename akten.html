@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patientenakten - UKS Sonnenberg</title>
-    <!-- Firebase SDKs (Compat Version für einfache Einbindung) -->
+    
+    <!-- Firebase SDKs (Compat Version für einfache Einbindung ohne npm) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     
@@ -189,18 +190,18 @@
 
 <script>
     // --- FIREBASE KONFIGURATION ---
-const firebaseConfig = {
-  apiKey: "AIzaSyBFh41RWefmwmNE_F_NRPv2WnTfgZDEGZk",
-  authDomain: "realtime-database-8a623.firebaseapp.com",
-  databaseURL: "https://realtime-database-8a623-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "realtime-database-8a623",
-  storageBucket: "realtime-database-8a623.firebasestorage.app",
-  messagingSenderId: "808024997653",
-  appId: "1:808024997653:web:83a9c53a27554dcebef31c",
-  measurementId: "G-XFWNKRJJH3"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyBFh41RWefmwmNE_F_NRPv2WnTfgZDEGZk",
+      authDomain: "realtime-database-8a623.firebaseapp.com",
+      databaseURL: "https://realtime-database-8a623-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "realtime-database-8a623",
+      storageBucket: "realtime-database-8a623.firebasestorage.app",
+      messagingSenderId: "808024997653",
+      appId: "1:808024997653:web:83a9c53a27554dcebef31c",
+      measurementId: "G-XFWNKRJJH3"
+    };
 
-    // Firebase initialisieren
+    // Firebase initialisieren (Wichtig: firebase. prefix nutzen!)
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -305,7 +306,7 @@ const firebaseConfig = {
                         <strong>Beurteilung:</strong> ${r.prozedere}
                     </div>
                 </div>
-            `).join('') : '<p>Keine Berichte vorhanden.</p>';
+            `).join('') : '<p style="padding: 15px;">Keine Berichte vorhanden.</p>';
 
             div.innerHTML = `
                 <div class="file-header">
@@ -331,7 +332,7 @@ const firebaseConfig = {
 
     function toggleReport(el) {
         const body = el.nextElementSibling;
-        body.style.display = body.style.display === 'block' ? 'none' : 'block';
+        body.style.display = (body.style.display === 'block') ? 'none' : 'block';
     }
 
     function searchFiles() {
@@ -339,7 +340,6 @@ const firebaseConfig = {
         document.querySelectorAll('.patient-file').forEach(f => f.style.display = f.innerText.toLowerCase().includes(val) ? 'block' : 'none');
     }
 
-    // PDF Druckfunktion bleibt wie sie ist...
     function printReport(pid, rid) {
         const p = patients.find(x => x.id == pid);
         const r = p.reports.find(x => x.id == rid);
