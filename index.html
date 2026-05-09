@@ -39,9 +39,9 @@
             width: 90%;
             margin: 40px auto;
             display: grid;
-            /* Erzeugt zwei gleich breite Spalten */
             grid-template-columns: 1fr 1fr; 
             gap: 25px;
+            justify-items: center; /* Zentriert die Items horizontal im Grid */
         }
 
         .dashboard-card {
@@ -58,6 +58,13 @@
             flex-direction: column;
             align-items: center;
             box-sizing: border-box;
+            width: 100%; /* Nimmt die volle Breite der Spalte ein */
+        }
+
+        /* Spezialregel für die Patientenakten-Karte */
+        .full-width-card {
+            grid-column: span 2; /* Streckt sich über beide Spalten */
+            max-width: 437px;    /* Gleiche Breite wie die Karten oben (900px - 25px Gap) / 2 */
         }
 
         .dashboard-card:hover {
@@ -65,9 +72,6 @@
             background-color: var(--falken-gold);
             border-color: var(--falken-gold);
         }
-
-        /* Die spezial-Regel für die Pyramide wurde entfernt, 
-           damit alle Karten gleich behandelt werden */
 
         .icon { 
             font-size: 4em; 
@@ -86,10 +90,13 @@
             margin-top: 10px; 
         }
 
-        /* Responsive Design für Handys */
         @media (max-width: 600px) {
             .container { 
                 grid-template-columns: 1fr; 
+            }
+            .full-width-card {
+                grid-column: span 1;
+                max-width: 100%;
             }
         }
 
@@ -137,10 +144,11 @@
         <div class="card-desc">Mitarbeiterliste</div>
     </a>
 
-        <a href="akten.html" class="dashboard-card">
+    <!-- Diese Karte hat nun die zusätzliche Klasse "full-width-card" -->
+    <a href="akten.html" class="dashboard-card full-width-card">
         <div class="icon">📁</div>
-        <div class="card-title">Patietenaktensystem</div>
-        <div class="card-desc">NOtaufnahme Bericht/OP Bericht</div>
+        <div class="card-title">Patientenaktensystem</div>
+        <div class="card-desc">Notaufnahmen Bericht / OP Bericht</div>
     </a>
 
 </div>
